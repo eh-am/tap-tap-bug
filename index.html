@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div id="start-page">
+		<form action="">
+			<div>
+				<label for="level">Level:</label>
+
+				<input type="radio" name="level" value="1" checked="checked" id="level1"><label for="level1">1</label>
+				<input type="radio" name="level" value="2" id="level2"><label for="level2">2</label>
+			</div>
+			<div>
+				<label for="high-score">High Score</label><span id="highScore"> 0</span>	
+			</div>
+			
+			<button id="startGameButton">Start Game!</button>	
+		</form>
+		
+	</div>
+
+	<canvas id="game"></canvas>
+	<script src="script.js"></script>
+</body>
+</html>

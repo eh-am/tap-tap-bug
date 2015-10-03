@@ -44,8 +44,10 @@ function spawnBug(){
 	var bug = {
 		x: getRandomNum(BUG_WIDTH/2, GAME_WIDTH - BUG_WIDTH/2),
 		y: -BUG_HEIGHT/2,
+		velocity: 6,
 		width: BUG_WIDTH,
 		height: BUG_HEIGHT,
+		rotation: 0,
 		format: "rectangle"
 	};
 
@@ -56,11 +58,9 @@ function spawnBug(){
 	ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
 
 	setInterval(function (){
-		//updateBug(bug);
+		updateBug(bug);
 	}, 100);
 	bugs.push(bug);
-
-		getNearestFoodFrom(bug);
 }
 
 function updateBugs(){
@@ -111,16 +111,89 @@ function updateBug(bug){
 	ctx.clearRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);
 	console.log("updating");
 
-	//bug.x = bug.x + 1;
-	bug.y = bug.y + 6;
+	var nearestFood = getNearestFoodFrom(bug);
 
-	ctx.fillStyle = "rgba(10, 45, 55, 0.5)";
+	if (bug.x + bug.width >= GAME_WIDTH ||
+		bug.y + bug.height >= GAME_HEIGHT ||
+		bug.x - bug.width <= 0){
+		console.log("stop walking");
+		return;
+	}
+
+	// rotates or moves in x axis
+	if (nearestFood.y + nearestFood.height >= bug.y &&
+		nearestFood.y + nearestFood.height <= bug.y + bug.height){
+
+		//TODO: rotate
+
+		// it doesn't need to rotate anymore
+		if (90 === Math.abs(bug.rotation)){
+
+			// nao precisa MAIS rotacionar
+			ctx.save();
+			var pivotX = bug.x + bug.width/2;
+			var pivotY = bug.y + bug.height/2;
+			ctx.translate(pivotX, pivotY);
+
+			ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+			ctx.rotate(bug.rotation * Math.PI/180);
+
+			ctx.fillStyle = "rgba(200, 45, 55, 1)";
+
+			// moves the bug into the right direction
+			bug.x += (bug.velocity * Math.sign(nearestFood.x - bug.x));
+
+			ctx.fillRect(bug.x - pivotX + bug.velocity, bug.y - pivotY,
+														bug.width, bug.height);
+			ctx.restore();
+				return;
+		} else {
+			rotateBug();	
+			return;
+		}
+		
+	}else {
+		bug.y += bug.velocity;
+	}
+
+
+	function rotateBug(){
+		ctx.save();
+		var pivotX = bug.x + bug.width/2;
+		var pivotY = bug.y + bug.height/2;
+
+		ctx.translate(pivotX, pivotY);
+		ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+
+		bug.rotation += (bug.velocity * Math.sign(bug.x - nearestFood.x));
+
+
+		//it's almost 90 degrees!
+		if ((90 - bug.velocity) <= Math.abs(bug.rotation) &&
+			(90 + bug.velocity) >= Math.abs(bug.rotation) &&
+			90 !== Math.abs(bug.rotation)
+			){
+			// set to 90 degrees then
+			bug.rotation = 90 * Math.sign(bug.x - nearestFood.x);
+		}
+
+		
+
+		ctx.rotate(bug.rotation * Math.PI/180);
+
+		ctx.fillStyle = "rgba(200, 45, 55, 1)";
+		ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+		ctx.restore();
+	}
+
+
+	ctx.fillStyle = "rgba(200, 45, 55, 1)";
 	ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
 
 	ctx.fillStyle = "rgba(0, 0, 0, 1)";
 	ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
 
-
+	ctx.restore();
 }
 
 

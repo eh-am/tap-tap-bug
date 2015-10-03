@@ -44,7 +44,7 @@ function spawnBug(){
 	var bug = {
 		x: getRandomNum(BUG_WIDTH/2, GAME_WIDTH - BUG_WIDTH/2),
 		y: -BUG_HEIGHT/2,
-		velocity: 6,
+		velocity: 75,
 		width: BUG_WIDTH,
 		height: BUG_HEIGHT,
 		rotation: 0,
@@ -57,9 +57,11 @@ function spawnBug(){
 	ctx.fillStyle = "rgba(0, 0, 0, 1)";
 	ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
 
+	var t = 0; 
+	var km = 0;
 	setInterval(function (){
 		updateBug(bug);
-	}, 100);
+	}, 1000/bug.velocity);
 	bugs.push(bug);
 }
 
@@ -82,9 +84,9 @@ function getNearestFoodFrom(bug){
 		}
 	});
 
-	console.log("nearest food of distance " + getDistanceBetween(bug, nearestFood));
-		console.log("food mais perto");
-	console.log(nearestFood);
+	// console.log("nearest food of distance " + getDistanceBetween(bug, nearestFood));
+	// 	console.log("food mais perto");
+	// console.log(nearestFood);
 
 	// shows the nearest food
 	// TODO: remove
@@ -101,7 +103,7 @@ function getNearestFoodFrom(bug){
 
 		// console.log("bug pos " + obj1.x + " : " + obj1.y );
 		// console.log("food pos " + obj2.x + " : " + obj2.y );
-		console.log("distance " + distance);
+	//	console.log("distance " + distance);
 		return distance;
 	}
 }
@@ -109,9 +111,14 @@ function getNearestFoodFrom(bug){
 function updateBug(bug){
 	ctx.clearRect(bug.x, bug.y, bug.width, bug.height);
 	ctx.clearRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);
-	console.log("updating");
+	//console.log("updating");
 
+	console.log("vamos ver as foods");
+	console.log(foods);
 	var nearestFood = getNearestFoodFrom(bug);
+	// check for collision
+	handleEat(bug, nearestFood);
+
 
 	if (bug.x + bug.width >= GAME_WIDTH ||
 		bug.y + bug.height >= GAME_HEIGHT ||
@@ -121,72 +128,47 @@ function updateBug(bug){
 	}
 
 	// rotates or moves in x axis
-	if (nearestFood.y + nearestFood.height >= bug.y &&
-		nearestFood.y + nearestFood.height <= bug.y + bug.height){
+	if (nearestFood.y + nearestFood.height/2 >= (bug.y + bug.height/2) &&
+		nearestFood.y + nearestFood.height/2 <= (bug.y + bug.height/2)){
 
 		//TODO: rotate
 
 		// it doesn't need to rotate anymore
-		if (90 === Math.abs(bug.rotation)){
-
+		//if (90 === Math.abs(bug.rotation)){
+		if (bug.needsRotation === false){
+			console.log("ja rotacionei, agora andando no x");
 			// nao precisa MAIS rotacionar
 			ctx.save();
 			var pivotX = bug.x + bug.width/2;
 			var pivotY = bug.y + bug.height/2;
 			ctx.translate(pivotX, pivotY);
 
-			ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
 			ctx.rotate(bug.rotation * Math.PI/180);
+			ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+		
 
 			ctx.fillStyle = "rgba(200, 45, 55, 1)";
 
 			// moves the bug into the right direction
-			bug.x += (bug.velocity * Math.sign(nearestFood.x - bug.x));
+			bug.x += (Math.sign(nearestFood.x - bug.x));
 
-			ctx.fillRect(bug.x - pivotX + bug.velocity, bug.y - pivotY,
+			ctx.fillRect(bug.x - pivotX + 1, bug.y - pivotY,
 														bug.width, bug.height);
+			console.log(bug.x + " : " + bug.y);
 			ctx.restore();
-				return;
+			return;
 		} else {
+			//prepareCanvas();
+			//console.log("rotacionando");
+			bug.needsRotation = true;
 			rotateBug();	
 			return;
 		}
 		
 	}else {
-		bug.y += bug.velocity;
+		//console.log("andando no y");
+		bug.y += (Math.sign(nearestFood.y - bug.y));
 	}
-
-
-	function rotateBug(){
-		ctx.save();
-		var pivotX = bug.x + bug.width/2;
-		var pivotY = bug.y + bug.height/2;
-
-		ctx.translate(pivotX, pivotY);
-		ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
-
-		bug.rotation += (bug.velocity * Math.sign(bug.x - nearestFood.x));
-
-
-		//it's almost 90 degrees!
-		if ((90 - bug.velocity) <= Math.abs(bug.rotation) &&
-			(90 + bug.velocity) >= Math.abs(bug.rotation) &&
-			90 !== Math.abs(bug.rotation)
-			){
-			// set to 90 degrees then
-			bug.rotation = 90 * Math.sign(bug.x - nearestFood.x);
-		}
-
-		
-
-		ctx.rotate(bug.rotation * Math.PI/180);
-
-		ctx.fillStyle = "rgba(200, 45, 55, 1)";
-		ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
-		ctx.restore();
-	}
-
-
 	ctx.fillStyle = "rgba(200, 45, 55, 1)";
 	ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
 
@@ -194,6 +176,76 @@ function updateBug(bug){
 	ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
 
 	ctx.restore();
+
+
+	function handleEat(bug, nearestFood){
+		if (isNextTo(bug.x + bug.width/2, nearestFood.x + nearestFood.width/2, 5) &&
+			isNextTo(bug.y + bug.height/2, nearestFood.y + nearestFood.height/2, 5)){
+			console.log("comeu");
+			FoodGenerator.removeFood(nearestFood);
+		}
+	}
+
+
+	function rotateBug(){
+		ctx.save();
+		var pivotX = bug.x + bug.width/2;
+		var pivotY = bug.y + bug.height/2;
+		ctx.translate(pivotX, pivotY);
+
+		ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+
+		bug.rotation += (1 * Math.sign(bug.x - nearestFood.x));
+
+
+		//it's almost 90 degrees!
+		if (Math.abs(90 - 1) <= Math.abs(bug.rotation) &&
+			Math.abs(90 + 1) >= Math.abs(bug.rotation) &&
+			90 !== Math.abs(bug.rotation)
+			){
+			// set to 90 degrees then
+			bug.rotation = 90 * Math.sign(bug.x - nearestFood.x);
+			bug.needsRotation = false;
+		}
+
+		
+		ctx.rotate(bug.rotation * Math.PI/180);
+
+		ctx.fillStyle = "rgba(200, 45, 55, 1)";
+		ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+		ctx.restore();
+	}
+}
+
+
+/*
+* 	returns true if two values are inside a 'margin'
+*/
+function isNextTo(val1, val2, threshold){
+	if  (((val2 >= val1 - threshold) &&
+		 (val2 <= val1 + threshold)) ||
+
+		 ((val1 >= val2 - threshold) &&
+		 (val1 <= val2 + threshold)))
+		{
+		return true;
+	}
+	return false;
+}
+
+function hasStrongCollision(obj1, obj2){
+	// TODO
+	// collision only handling rectangles for now
+	if (obj1.format === 'rectangle' && obj2.format === 'rectangle'){
+		if (obj1.x < obj2.x + obj2.width &&
+	   		obj1.x + obj1.width > obj2.x &&
+	   		obj1.y < obj2.y + obj2.height &&
+	   		obj1.height + obj1.y > obj2.y) {
+		    return true;
+		}
+
+		return false;		
+	}
 }
 
 
@@ -204,6 +256,7 @@ function getRandomNum(min, max){
 
 
 startGame();
+
 
 
 

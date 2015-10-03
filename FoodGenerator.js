@@ -15,6 +15,7 @@ var FoodGenerator = (function (){
 	function generateFoodPosition(){
 		function generate(){
 			var food = {
+				id: foods.length,
 				width: FOOD_WIDTH,
 				height: FOOD_HEIGHT
 			};
@@ -43,6 +44,16 @@ var FoodGenerator = (function (){
 		return hasOverlap;
 	}
 
+	function removeFood(food){
+		//TODO
+		console.log("removendo comida ");
+		ctx.clearRect(food.x, food.y, FOOD_WIDTH, FOOD_HEIGHT);
+		foods = foods.filter(function (f){
+			if (f.id !== food.id) return true;
+			else return false;
+		});
+	}
+
 	function hasFoodCollision(obj1, obj2){
 		// TODO
 		// collision only handling rectangles for now
@@ -60,7 +71,8 @@ var FoodGenerator = (function (){
 	}
 
 	return {
-		generate : spawnInitialFood
+		generate : spawnInitialFood,
+		removeFood : removeFood
 	};
 
 })();

@@ -38,12 +38,12 @@ var FoodGenerator = (function (){
 	function hasFoodOverlap(newFood){
 		var hasOverlap = false;
 		for (var i = 0; i < foods.length; i++){
-			if (hasCollision(newFood, foods[i])) hasOverlap = true;
+			if (hasFoodCollision(newFood, foods[i])) hasOverlap = true;
 		}
 		return hasOverlap;
 	}
 
-	function hasCollision(obj1, obj2){
+	function hasFoodCollision(obj1, obj2){
 		// TODO
 		// collision only handling rectangles for now
 		if (obj1.format === 'rectangle' && obj2.format === 'rectangle'){

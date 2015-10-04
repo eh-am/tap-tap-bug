@@ -1,0 +1,19 @@
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+#info-bar {
+	display: -webkit-flex;
+	display: flex;
+	background-color: #d35400;
+	color: #ecf0f1;
+	font-size: 20px;
+	width: 400px;
+	padding: 10px;
+	font-family: Verdana, sans-serif;
+}
+#timer, #pause-play, #score{
+	flex: 1;
+}
+#pause-play{ text-align: center; cursor: pointer;}
+#score{ text-align: right; }

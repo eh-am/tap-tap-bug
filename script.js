@@ -48,6 +48,7 @@ function spawnBug(){
 		width: BUG_WIDTH,
 		height: BUG_HEIGHT,
 		rotation: 0,
+		needsRotation: false,
 		format: "rectangle"
 	};
 
@@ -109,73 +110,170 @@ function getNearestFoodFrom(bug){
 }
 
 function updateBug(bug){
-	ctx.clearRect(bug.x, bug.y, bug.width, bug.height);
-	ctx.clearRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);
 	//console.log("updating");
 
-	console.log("vamos ver as foods");
-	console.log(foods);
 	var nearestFood = getNearestFoodFrom(bug);
 	// check for collision
 	handleEat(bug, nearestFood);
 
 
-	if (bug.x + bug.width >= GAME_WIDTH ||
-		bug.y + bug.height >= GAME_HEIGHT ||
-		bug.x - bug.width <= 0){
-		console.log("stop walking");
+//	var f_moveForward = setTimeInterval(moveForward, 1000/bug.velocity);
+//	var f_rotateBug = setTimeInterval(rotateBug, 1000/bug.velocity);
+
+
+	if (bug.needsRotation === true){
+		rotateBug();
 		return;
 	}
+	if (bug.needsRotation === false){
+		moveForward();
+	}
 
-	// rotates or moves in x axis
-	if (nearestFood.y + nearestFood.height/2 >= (bug.y + bug.height/2) &&
-		nearestFood.y + nearestFood.height/2 <= (bug.y + bug.height/2)){
 
-		//TODO: rotate
+	// x is aligned
+	if (bug.needsRotation === false && (nearestFood.x + nearestFood.width/2) === (bug.x + bug.width/2)){
+		// TODO
+		// rotate and move forward
+		if ((bug.rotation % 90) === 0 && bug.rotation > 0){
+			console.log("doesn't need rotation anymore")
+			bug.needsRotation = false;
+			
+		}else {
+			bug.needsRotation = true;
+			console.log("eixo x alinhado")
+			rotateFirst();			
+		}
 
-		// it doesn't need to rotate anymore
-		//if (90 === Math.abs(bug.rotation)){
-		if (bug.needsRotation === false){
-			console.log("ja rotacionei, agora andando no x");
-			// nao precisa MAIS rotacionar
+	} else if (bug.needsRotation === false && ((nearestFood.y + nearestFood.height/2) === (bug.y + bug.height/2))){
+		// y is aligned
+		// rotate and move forward
+		console.log("eixo y alinhado");
+		console.log(bug.rotation);
+		if ((bug.rotation % 90) === 0 && bug.rotation > 0){
+			console.log("doesn't need rotation anymore")
+			bug.needsRotation = false;
+			
+		}else {
+			bug.needsRotation = true;
+			console.log("eixo x alinhado")
+			rotateFirst();			
+		}
+	}
+
+	function moveForward(){
+		console.log("moving forward");
+		if (bug.rotation !== 0){
+			var distanceY = Math.abs((nearestFood.y + nearestFood.height/2) - 
+												 (bug.y + bug.height/2));
+			
+			var distanceX = Math.abs((nearestFood.x + nearestFood.width/2) - 
+									 (bug.x + bug.width/2));
+
 			ctx.save();
 			var pivotX = bug.x + bug.width/2;
 			var pivotY = bug.y + bug.height/2;
-			ctx.translate(pivotX, pivotY);
-
+			ctx.translate(pivotX, pivotY);		
 			ctx.rotate(bug.rotation * Math.PI/180);
+
 			ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
-		
+
+			console.log(distanceY)
+			if (distanceX <= distanceY || distanceY === 0){ //move in X axis
+				console.log("andando no x")
+				bug.x += (Math.sign((nearestFood.x + nearestFood.width/2) - (bug.x + bug.width/2)));
+			} else { //Move in Y axis
+				console.log("andando no y")
+				bug.y += (Math.sign((nearestFood.y + nearestFood.height/2)
+						 - (bug.y + bug.height/2)));
+			}
 
 			ctx.fillStyle = "rgba(200, 45, 55, 1)";
-
-			// moves the bug into the right direction
-			bug.x += (Math.sign(nearestFood.x - bug.x));
-
-			ctx.fillRect(bug.x - pivotX + 1, bug.y - pivotY,
-														bug.width, bug.height);
-			console.log(bug.x + " : " + bug.y);
+			ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
 			ctx.restore();
-			return;
-		} else {
-			//prepareCanvas();
-			//console.log("rotacionando");
-			bug.needsRotation = true;
-			rotateBug();	
-			return;
+
+		}else{
+			var distanceY = Math.abs((nearestFood.y + nearestFood.height/2) - 
+												 (bug.y + bug.height/2));
+			
+			var distanceX = Math.abs((nearestFood.x + nearestFood.width/2) - 
+									 (bug.x + bug.width/2));
+
+			ctx.save();
+
+			ctx.clearRect(bug.x, bug.y, bug.width, bug.height);
+			ctx.clearRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);
+
+			bug.y += (Math.sign((nearestFood.y + nearestFood.height/2) - (bug.y + bug.height/2)));
+
+			// if (distanceX <= distanceY){ //move in X axis
+			// 	bug.x += (Math.sign((nearestFood.x + nearestFood.width/2) - (bug.x + bug.width/2)));
+			// } else { //Move in Y axis
+			// 	
+			// }
+			
+			ctx.fillStyle = "rgba(200, 45, 55, 1)";
+			ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
+
+			ctx.fillStyle = "rgba(0, 0, 0, 1)";
+			ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
+
+			ctx.restore();
 		}
-		
-	}else {
-		//console.log("andando no y");
-		bug.y += (Math.sign(nearestFood.y - bug.y));
+
+
 	}
-	ctx.fillStyle = "rgba(200, 45, 55, 1)";
-	ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
 
-	ctx.fillStyle = "rgba(0, 0, 0, 1)";
-	ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
 
-	ctx.restore();
+
+
+	// if (nearestFood.y + nearestFood.height/2 >= (bug.y + bug.height/2) &&
+	// 	nearestFood.y + nearestFood.height/2 <= (bug.y + bug.height/2)){
+
+	// 	//TODO: rotate
+
+	// 	// it doesn't need to rotate anymore
+	// 	//if (90 === Math.abs(bug.rotation)){
+	// 	if (bug.needsRotation === false){
+	// 		console.log("ja rotacionei, agora andando no x");
+	// 		// nao precisa MAIS rotacionar
+	// 		ctx.save();
+	// 		var pivotX = bug.x + bug.width/2;
+	// 		var pivotY = bug.y + bug.height/2;
+	// 		ctx.translate(pivotX, pivotY);
+
+	// 		ctx.rotate(bug.rotation * Math.PI/180);
+	// 		ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+		
+
+	// 		ctx.fillStyle = "rgba(200, 45, 55, 1)";
+
+	// 		// moves the bug into the right direction
+	// 		bug.x += (Math.sign(nearestFood.x - bug.x));
+
+	// 		ctx.fillRect(bug.x - pivotX + 1, bug.y - pivotY,
+	// 													bug.width, bug.height);
+	// 		console.log(bug.x + " : " + bug.y);
+	// 		ctx.restore();
+	// 		return;
+	// 	} else {
+	// 		//prepareCanvas();
+	// 		//console.log("rotacionando");
+	// 		bug.needsRotation = true;
+	// 		rotateBug();	
+	// 		return;
+	// 	}
+		
+	// }else {
+	// 	//console.log("andando no y");
+	// 	bug.y += (Math.sign(nearestFood.y - bug.y));
+	// }
+	// ctx.fillStyle = "rgba(200, 45, 55, 1)";
+	// ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
+
+	// ctx.fillStyle = "rgba(0, 0, 0, 1)";
+	// ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
+
+	// ctx.restore();
 
 
 	function handleEat(bug, nearestFood){
@@ -186,30 +284,45 @@ function updateBug(bug){
 		}
 	}
 
-
-	function rotateBug(){
+	function rotateFirst(){
 		ctx.save();
 		var pivotX = bug.x + bug.width/2;
 		var pivotY = bug.y + bug.height/2;
 		ctx.translate(pivotX, pivotY);
 
-		ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+
 
 		bug.rotation += (1 * Math.sign(bug.x - nearestFood.x));
+		
+
+		ctx.rotate(bug.rotation * Math.PI/180);
+		ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+
+		ctx.fillStyle = "rgba(200, 45, 55, 1)";
+		ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+		ctx.restore();
+	}
 
 
-		//it's almost 90 degrees!
-		if (Math.abs(90 - 1) <= Math.abs(bug.rotation) &&
-			Math.abs(90 + 1) >= Math.abs(bug.rotation) &&
-			90 !== Math.abs(bug.rotation)
-			){
-			// set to 90 degrees then
-			bug.rotation = 90 * Math.sign(bug.x - nearestFood.x);
-			bug.needsRotation = false;
+	function rotateBug(){
+
+		if ((bug.rotation % 90 === 0)){
+			console.log("doesn't need rotation anymore")
+			bug.needsRotation = false;	
 		}
 
+		ctx.save();
+		var pivotX = bug.x + bug.width/2;
+		var pivotY = bug.y + bug.height/2;
+		ctx.translate(pivotX, pivotY);
+
+
+
+		bug.rotation += (1 * Math.sign(bug.x - nearestFood.x));
 		
+
 		ctx.rotate(bug.rotation * Math.PI/180);
+		ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
 
 		ctx.fillStyle = "rgba(200, 45, 55, 1)";
 		ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);

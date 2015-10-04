@@ -236,35 +236,19 @@ function updateBug(bug){
 		}
 	}
 
-	function rotateFirst(){
-		ctx.save();
-		var pivotX = bug.x + bug.width/2;
-		var pivotY = bug.y + bug.height/2;
-		ctx.translate(pivotX, pivotY);
-
-
-
-		bug.rotation += (1 * Math.sign(bug.x - nearestFood.x));
-		
-
-		ctx.rotate(bug.rotation * Math.PI/180);
-		ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
-
-		ctx.fillStyle = "rgba(200, 45, 55, 1)";
-		ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
-		ctx.restore();
-	}
 
 
 	function rotateBug(){
+		console.log("rotating");
 
+		ctx.save();
 		if ((bug.rotation % 90 === 0)){
 			console.log("doesn't need rotation anymore")
 			bug.needsRotation = false;	
 			moveForward();
 		}
 
-		ctx.save();
+
 		var pivotX = bug.x + bug.width/2;
 		var pivotY = bug.y + bug.height/2;
 		ctx.translate(pivotX, pivotY);

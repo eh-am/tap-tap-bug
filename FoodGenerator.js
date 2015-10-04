@@ -9,7 +9,18 @@ var FoodGenerator = (function (){
 		foods.push(newFood);
 		console.log(foods);
 		ctx.fillStyle = "rgba(100, 100, 200, 0.5)";
-		ctx.fillRect(newFood.x, newFood.y, FOOD_WIDTH, FOOD_HEIGHT);
+		//ctx.fillRect(newFood.x, newFood.y, FOOD_WIDTH, FOOD_HEIGHT);
+
+        ctx.save(); // save state
+        ctx.beginPath();
+
+        ctx.translate(newFood.x, newFood.y);
+        ctx.scale(newFood.width, newFood.height);
+        ctx.arc(1, 1, 1, 0, 2 * Math.PI, false);
+
+        ctx.restore(); // restore to original state
+        ctx.stroke();
+
 	}
 
 	function generateFoodPosition(){

@@ -21,10 +21,17 @@ var gamePaused = false;
 var startButton = document.getElementById("startGameButton");
 startButton.addEventListener("click", function (e){
 	e.preventDefault();
+	document.getElementById("game-wrapper").className = "";
 	console.log("started");
-	//startGame();
+	var selectedLevel = getSelectedLevel();
+	document.getElementById("start-page").className = "hide";
+	startGame();
 });
 
+function getSelectedLevel(){
+	var selectedValue = document.startPageForm['level'].value;
+	return selectedValue;
+}
 
 
 
@@ -314,7 +321,7 @@ function getRandomNum(min, max){
 }
 
 
-startGame();
+//startGame();
 
 
 

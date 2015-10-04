@@ -2,18 +2,71 @@
   box-sizing: border-box;
 }
 
+.container{
+	max-width: 400px;
+	margin: 0 auto;
+}
+
+body{
+	font-family: Verdana, sans-serif;
+	font-size: 20px;
+}
+
+#start-page{
+	background: #f1c40f;
+	height: 600px;
+	width: 400px;
+	position: relative;
+	margin: 40px 0;
+}
+
+.startPageForm{
+	text-align: center;
+	color: #000;
+}
+.startPageForm button{
+	padding: 20px;
+	font-size: 20px;
+	border: 0;
+	background: #8e44ad;
+	color: white;
+}
+.game-title{
+	font-family: 'Walter Turncoat', cursive;
+	font-size: 66px;
+	padding: 60px 0;
+	margin: 0;
+}
+.level-select{
+	padding: 20px 0;
+}
+.level-select span{
+
+}
+.high-score{
+	padding: 20px;
+}
+.high-score > div{
+	font-size: 40px;
+	text-shadow: 2px 2px 3px #696969;
+}
+
 #info-bar {
 	display: -webkit-flex;
 	display: flex;
-	background-color: #d35400;
-	color: #ecf0f1;
-	font-size: 20px;
+	background-color: #f39c12;
+	color: white;
+	
 	width: 400px;
 	padding: 10px;
-	font-family: Verdana, sans-serif;
+
 }
 #timer, #pause-play, #score{
 	flex: 1;
 }
 #pause-play{ text-align: center; cursor: pointer;}
 #score{ text-align: right; }
+
+.hide{
+	display: none;
+}

@@ -4,33 +4,51 @@
 	<meta charset="UTF-8">
 	<title>Document</title>
 
+	<link href='https://fonts.googleapis.com/css?family=Walter+Turncoat' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<div id="start-page">
-		<form action="">
-			<div>
-				<label for="level">Level:</label>
+	<div class="container">
+		<div id="start-page">
+			<form action="" name="startPageForm" class="startPageForm">
+	
 
-				<input type="radio" name="level" value="1" checked="checked" id="level1"><label for="level1">1</label>
-				<input type="radio" name="level" value="2" id="level2"><label for="level2">2</label>
-			</div>
-			<div>
-				<label for="high-score">High Score</label><span id="highScore"> 0</span>	
-			</div>
-			
-			<button id="startGameButton">Start Game!</button>	
-		</form>
-		
+				<h1 class="game-title">TAP TAP BUG</h1>		
+				
+				<div class="high-score">
+					<label for="high-score">High Score</label>
+					<div id="highScore"> 0</div>	
+				</div>
+				<button id="startGameButton">Start Game</button>	
+
+				<div class="level-select">
+					<label for="level">Level:</label>
+					
+					<span>
+						<input type="radio" name="level" value="1" checked="checked" id="level1">
+						<label for="level1">1</label>
+					</span>
+					<span>
+						<input type="radio" name="level" value="2" id="level2">
+						<label for="level2">2</label>	
+					</span>					
+				</div>	
+
+
+			</form>
+		</div>	
 	</div>
 
-	<div id="game-wrapper">
-		<div id="info-bar">
-			<div id="timer"><span id="timer-content"></span><label for="timer"> sec</label></div>
-			<div id="pause-play">&#10074;&#10074;</div>
-			<div id="score"><label for="score">Score: </label><span id="score-content">0</span></div>
+	<div id="game-wrapper" class="hide">
+		<div class="container">
+			<div id="info-bar">
+				<div id="timer"><span id="timer-content"></span><label for="timer"> sec</label></div>
+				<div id="pause-play">&#10074;&#10074;</div>
+				<div id="score"><label for="score">Score: </label><span id="score-content">0</span></div>
+			</div>
+			<canvas id="game"></canvas>
 		</div>
-		<canvas id="game"></canvas>
 	</div>
 	
 	<script src="FoodGenerator.js"></script>

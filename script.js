@@ -21,14 +21,14 @@ var gamePaused = false;
 var startButton = document.getElementById("startGameButton");
 startButton.addEventListener("click", function (e){
 	e.preventDefault();
-	document.getElementById("game-wrapper").className = "";
-	console.log("started");
-	var selectedLevel = getSelectedLevel();
-	document.getElementById("start-page").className = "hide";
+
 	startGame();
 });
 
 function getSelectedLevel(){
+
+
+
 	var selectedValue = document.startPageForm['level'].value;
 	return selectedValue;
 }
@@ -36,6 +36,10 @@ function getSelectedLevel(){
 
 
 function startGame(){
+	document.getElementById("game-wrapper").className = "";
+	var selectedLevel = getSelectedLevel();
+	document.getElementById("start-page").className = "hide";
+
 	ctx.canvas.width = GAME_WIDTH;
 	ctx.canvas.height = GAME_HEIGHT;
 
@@ -85,6 +89,7 @@ function spawnBug(){
 		height: BUG_HEIGHT,
 		rotation: 0,
 		needsRotation: false,
+		angle : 0,
 		format: "rectangle"
 	};
 
@@ -132,6 +137,8 @@ function getNearestFoodFrom(bug){
 
 	return nearestFood;
 
+}
+
 	function getDistanceBetween(obj1, obj2){
 		var distance;
 		var v1 = Math.pow((obj1.x - obj2.x), 2);
@@ -143,90 +150,163 @@ function getNearestFoodFrom(bug){
 	//	console.log("distance " + distance);
 		return distance;
 	}
+
+function rotateBugToFood(nearestFood, bug){
+	ctx.save();
+	console.log("rotating");
+	if (bug.angle === 0){
+		ctx.clearRect(bug.x, bug.y, bug.width, bug.height);
+		ctx.clearRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
+	}
+
+	var angle = findAngle(nearestFood.x + nearestFood.width/2, nearestFood.y + nearestFood.height/2, bug.x + bug.width/2, bug.y + bug.height/2);
+	var pivotX = bug.x + bug.width/2;
+	var pivotY = bug.y + bug.height/2;
+
+	bug.angle = angle;
+
+	ctx.translate(pivotX, pivotY);
+	ctx.rotate(angle + 0.5 * Math.PI);
+
+	ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+	ctx.clearRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
+
+	ctx.fillStyle = "rgba(200, 45, 55, 1)";
+	ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+
+	ctx.fillStyle = "rgba(0, 0, 0, 1)";
+	ctx.fillRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
+
+	ctx.restore();
 }
 
+	function findAngle(x1,y1,x2,y2){
+		return theta = Math.atan2(y2-y1, x2-x1);
+	}
+
 function updateBug(bug){
-	//console.log("updating");
 	if (gamePaused === true) return;
 	
 	var nearestFood = getNearestFoodFrom(bug);
+
+
 	// check for collision
 	handleEat(bug, nearestFood);
 
-	if ((nearestFood.y + nearestFood.height/2) === (bug.y + bug.height/2)){
-		console.log("y alinhado");
-		bug.rotation = (90 * Math.sign(bug.x - nearestFood.x));
-		bug.needsRotation = true;
-		moveForward();
-	}
-	else if((nearestFood.x + nearestFood.width/2) === (bug.x + bug.width/2)){
-		bug.rotation = (180 * Math.sign(bug.x - nearestFood.x));
-		bug.needsRotation = true;
-		moveForward();
-	} else {
-		moveForward();	
-	}
+	rotateBugToFood(nearestFood, bug);
+	moveForwardNew();
+
+
+	// // se a cabeca da formiga estiver longe do meio da comida
+	// // rotaciona
+	// console.log("distancia cabeca e food " + getDistanceBetween({ x: bug.x + bug.width/2, y: bug.y + bug.height/2}, //distance between head and center of food
+	// 					   { x: nearestFood.x + nearestFood.width/2,
+	// 					   	 y: nearestFood.y + nearestFood.height/2 }));
+
+	// console.log("distancia rabo e food " + getDistanceBetween({ x: bug.x + bug.width/2, y: bug.y}, //distance between tail and center of food
+	// 					   { x: nearestFood.x + nearestFood.width/2,
+	// 					   	 y: nearestFood.y + nearestFood.height/2 }));
+
+	// if (getDistanceBetween({ x: bug.x + bug.width/2, y: bug.y + bug.height/2}, //distance between head and center of food
+	// 					   { x: nearestFood.x + nearestFood.width/2,
+	// 					   	 y: nearestFood.y + nearestFood.height/2 }) > 
+	// 	getDistanceBetween({ x: bug.x + bug.width/2, y: bug.y}, //distance between tail and center of food
+	// 					   { x: nearestFood.x + nearestFood.width/2,
+	// 					   	 y: nearestFood.y + nearestFood.height/2 })){
+	// 	console.log("preciso rotacionar");
+	// 	if (bug.rotationNeeded === bug.rotation && bug.rotationNeeded !== 0){
+	// 		moveForward();
+	// 	}else{
+	// 	rotateBug();	
+	// 	}
+		
+	// } else {
+	// 	moveForward();	
+	// }
 	
-
-	function moveForward(){
-		console.log("moving forward");
-		if (bug.rotation !== 0){
-			var distanceY = Math.abs((nearestFood.y + nearestFood.height/2) - 
-												 (bug.y + bug.height/2));
-			
-			var distanceX = Math.abs((nearestFood.x + nearestFood.width/2) - 
-									 (bug.x + bug.width/2));
-
+	function moveForwardNew(){
+		//if (bug.angle !== 0){	
+			{
+			console.log("forward new")	
 			ctx.save();
 			var pivotX = bug.x + bug.width/2;
 			var pivotY = bug.y + bug.height/2;
-			ctx.translate(pivotX, pivotY);		
-			ctx.rotate(bug.rotation * Math.PI/180);
 
+			bug.y += (Math.sign((nearestFood.y + nearestFood.height/2) - (bug.y + bug.height/2)));
+			bug.x += (Math.sign((nearestFood.x + nearestFood.width/2) - (bug.x + bug.width/2)));
+
+			ctx.translate(pivotX, pivotY);
+
+			// Apaga
+			ctx.rotate(bug.angle + 0.5 * Math.PI);
 			ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
-
-			console.log(distanceY)
-			if (distanceX <= distanceY || distanceY === 0){ //move in X axis
-				console.log("andando no x")
-				console.log("bug x " + bug.x);
-				console.log(bug);
-				bug.x += (Math.sign((nearestFood.x + nearestFood.width/2) - (bug.x + bug.width/2)));
-			} else { //Move in Y axis
-				console.log("andando no y")
-				bug.y += (Math.sign((nearestFood.y + nearestFood.height/2)
-						 - (bug.y + bug.height/2)));
-			}
+			ctx.clearRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
 
 			ctx.fillStyle = "rgba(200, 45, 55, 1)";
 			ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
-			ctx.restore();
-
-		}else{
-			var distanceY = Math.abs((nearestFood.y + nearestFood.height/2) - 
-												 (bug.y + bug.height/2));
-			
-			var distanceX = Math.abs((nearestFood.x + nearestFood.width/2) - 
-									 (bug.x + bug.width/2));
-
-			ctx.save();
-
-			ctx.clearRect(bug.x, bug.y, bug.width, bug.height);
-			ctx.clearRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);
-
-			bug.y += (Math.sign((nearestFood.y + nearestFood.height/2) - (bug.y + bug.height/2)));
-			
-			ctx.fillStyle = "rgba(200, 45, 55, 1)";
-			ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
 
 			ctx.fillStyle = "rgba(0, 0, 0, 1)";
-			ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
+			ctx.fillRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
 
 			ctx.restore();
 		}
-
-
 	}
 
+	function moveForward(){
+		var distanceY = Math.abs((nearestFood.y + nearestFood.height/2) - 
+										 (bug.y + bug.height/2));
+		
+		var distanceX = Math.abs((nearestFood.x + nearestFood.width/2) - 
+								 (bug.x + bug.width/2));
+
+		ctx.save();
+
+		ctx.clearRect(bug.x, bug.y, bug.width, bug.height);
+		ctx.clearRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);
+
+
+		bug.y += (Math.sign((nearestFood.y + nearestFood.height/2) - (bug.y + bug.height/2)));
+		bug.x += (Math.sign((nearestFood.x + nearestFood.width/2) - (bug.x + bug.width/2)));
+		
+		ctx.fillStyle = "rgba(200, 45, 55, 1)";
+		ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
+
+		ctx.fillStyle = "rgba(0, 0, 0, 1)";
+		ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
+
+		ctx.restore();
+	}
+
+	function rotateBug(){
+		console.log("rotating");
+		ctx.save();
+		var pivotX = bug.x + bug.width/2;
+		var pivotY = bug.y + bug.height/2;
+		//var pivotY = bug.y + bug.height;
+		ctx.translate(pivotX, pivotY);
+
+		var angle = findAngle(bug.x + bug.width/2, bug.y + bug.height, 
+							  nearestFood.x + nearestFood.width/2,
+							  nearestFood.y + nearestFood.height/2);
+
+		bug.rotationNeeded = parseInt(angle * 180/Math.PI) * -1;
+		console.log("rotation needed " + bug.rotationNeeded);
+		console.log("current rotation " + bug.rotation);
+		bug.rotation += (Math.sign(bug.rotationNeeded));
+		if (bug.rotation === bug.rotationNeeded){
+			gamePaused = true;
+		}
+		ctx.rotate(bug.rotation * Math.PI/180);
+		ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+
+		ctx.fillStyle = "rgba(200, 45, 55, 1)";
+		ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+
+		ctx.fillStyle = "rgba(0, 0, 0, 1)";
+		ctx.fillRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
+
+		ctx.restore();
+	}
 
 	function handleEat(bug, nearestFood){
 		if (isNextTo(bug.x + bug.width/2, nearestFood.x + nearestFood.width/2, 5) &&
@@ -238,34 +318,9 @@ function updateBug(bug){
 
 
 
-	function rotateBug(){
-		console.log("rotating");
 
-		ctx.save();
-		if ((bug.rotation % 90 === 0)){
-			console.log("doesn't need rotation anymore")
-			bug.needsRotation = false;	
-			moveForward();
-		}
-
-
-		var pivotX = bug.x + bug.width/2;
-		var pivotY = bug.y + bug.height/2;
-		ctx.translate(pivotX, pivotY);
-
-
-
-		bug.rotation += (1 * Math.sign(bug.x - nearestFood.x));
-		
-
-		ctx.rotate(bug.rotation * Math.PI/180);
-		ctx.clearRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
-
-		ctx.fillStyle = "rgba(200, 45, 55, 1)";
-		ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
-		ctx.restore();
-	}
 }
+
 
 
 /*
@@ -305,7 +360,7 @@ function getRandomNum(min, max){
 }
 
 
-//startGame();
+startGame();
 
 
 

@@ -4,6 +4,7 @@ var GAME_WIDTH = 400;
 var GAME_HEIGHT = 600;
 var GAME_TIME = 60;
 var GAME_FPS = 70;
+var gameScore = 0;
 
 var FOOD_WIDTH = 20;
 var FOOD_HEIGHT = 20;
@@ -36,6 +37,11 @@ function getSelectedLevel(){
 
 	var selectedValue = document.startPageForm['level'].value;
 	return selectedValue;
+}
+
+function updateScore(score){
+	gameScore += score;
+	document.getElementById("score-content").textContent = gameScore;
 }
 
 
@@ -82,6 +88,32 @@ function startGame(){
 	});
 
 	setInterval(gameLoop, 1000/GAME_FPS);
+	document.addEventListener("click", handleKillClick);
+}
+
+/*
+*	Handle when the user clicks to kill a bug
+*/
+function handleKillClick(e){
+	console.log("cliquei");
+	if (gamePaused === true) return;
+	var canvas = document.getElementById("game");
+  	var d;
+	
+	bugs.forEach(function (bug){
+		d = getDistanceBetween({ x: e.x - canvas.offsetLeft, y: e.y - canvas.offsetTop}, bug);
+		if (d <= 30){
+			killBug(bug);
+		}
+	});
+}
+
+function killBug(bug){
+	// TODO
+	// updates scores
+	updateScore(bug.score);
+	bug.available = false;
+
 }
 
 function gameOver(){
@@ -128,10 +160,13 @@ function spawnBug(){
 		rotation: 0,
 		angle : 0,
 		movedY: false,
+		available: true,
+		opacity: 1,
+		score: bugArchetype.score,
 		format: "rectangle"
 	};
 
-	ctx.fillStyle = "rgba(" + bug.color + ", 1)";
+	ctx.fillStyle = "rgba(" + bug.color + "," + bug.opacity + ")";
 	ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
 
 	ctx.fillStyle = "rgba(0, 0, 0, 1)";
@@ -187,7 +222,7 @@ function rotateBugToFood(nearestFood, bug){
 
 
 	// draw the bug
-	ctx.fillStyle = "rgba(" + bug.color + ", 1)";
+	ctx.fillStyle = "rgba(" + bug.color + "," + bug.opacity + ")";
 	ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
 
 	ctx.fillStyle = "rgba(0, 0, 0, 1)";
@@ -207,6 +242,9 @@ function updateBug(bug){
 		return ;
 	}
 
+	if (bug.available === false){
+		return;
+	}
 	// check for collision
 	handleEat(bug, nearestFood);
 
@@ -233,6 +271,7 @@ function updateBug(bug){
 
 		var futureBug = {
 			id: bug.id,
+			velocity: bug.velocity,
 			x: bug.x + moveX*2,
 			y: bug.y + moveY*2,
 			width: BUG_WIDTH,
@@ -245,6 +284,8 @@ function updateBug(bug){
 			if (bugs[i].id === futureBug.id) continue; //if it's the same bug
 			if (hasStrongCollision(futureBug, bugs[i]) === true){
 				// if it's next to the food than the other bug, continue
+				if (futureBug.velocity > bugs[i].velocity) continue;
+
 				if (getDistanceBetween(futureBug, nearestFood) >= getDistanceBetween(bugs[i], nearestFood)){
 					return;
 				}
@@ -298,13 +339,25 @@ function renderBug(bug){
 		ctx.translate(pivotX, pivotY);
 		ctx.rotate(bug.angle);
 
+		if (bug.available === false){
+			bug.opacity -= 0.05;
+		}
+		if (bug.opacity <= 0){ //if disappeared, stop drawing
+			bugs = bugs.filter(function (b){
+				if (b.id === bug.id &&
+					b.available === false) return false;
+				else return true;
+
+			});
+		}
+
 		redrawBug();
 		ctx.restore();
 
 
 
 		function redrawBug(){
-			ctx.fillStyle = "rgba(" + bug.color + ", 1)";
+			ctx.fillStyle = "rgba(" + bug.color + ", " + bug.opacity +")";
 			ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
 
 			ctx.fillStyle = "rgba(0, 0, 0, 1)";

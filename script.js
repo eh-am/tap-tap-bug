@@ -19,7 +19,7 @@ var bugs = [];
 var BUGS_ARCHETYPES = [
 	{color: "0, 0, 0", velocity: [150, 200], score: 5, probability: [0, 3]}, //red
 	{color: "192, 57, 43", velocity: [75, 100], score: 3, probability: [3, 6]} ,//red
-	{color: "230, 126, 34", velocity: [60, 80], score: 1, probability: [6, 11]} //orange
+	{color: "243, 156, 18", velocity: [60, 80], score: 1, probability: [6, 11]} //orange
 ];
 
 var gamePaused = false;
@@ -124,6 +124,9 @@ function gameOver(){
 function gameLoop(){
 	if (gamePaused === true) return;
 	ctx.clearRect(0,0, GAME_WIDTH, GAME_HEIGHT);
+	ctx.fillStyle = "rgb(236, 240, 241)";
+	ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
 	FoodGenerator.redraw();
 
 
@@ -374,8 +377,8 @@ function renderBug(bug){
 			var path = new Path2D();
 			ctx.fillStyle = "rgba(" + bug.color + ", " + bug.opacity +")";
 
-			ctx.globalAlpha = bug.opacity;
 			
+
 			//draws the head
 			path.arc(0,
 					 (bug.y + bug.height) - pivotY,
@@ -394,6 +397,7 @@ function renderBug(bug){
 			ctx.fillStyle = "rgba(" + bug.color + ", " + bug.opacity +")";
         	ctx.beginPath();
 
+			ctx.globalAlpha = bug.opacity;
         	var pivotLegs = {
         		x: 0,
         		y: -10

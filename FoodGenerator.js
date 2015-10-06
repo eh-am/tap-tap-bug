@@ -3,11 +3,16 @@ var FoodGenerator = (function (){
 	function spawnInitialFood(){
 		for (var i = 0; i < 5; i++) drawFood();
 	}
+	function redraw(){
+		foods.forEach(function (food){
+			ctx.fillStyle = "rgba(100, 100, 200, 0.5)";
+			ctx.fillRect(food.x, food.y, FOOD_WIDTH, FOOD_HEIGHT);
+		});
+	}
 	function drawFood(){
 		var newFood = generateFoodPosition();
 
 		foods.push(newFood);
-		console.log(foods);
 		ctx.fillStyle = "rgba(100, 100, 200, 0.5)";
 		ctx.fillRect(newFood.x, newFood.y, FOOD_WIDTH, FOOD_HEIGHT);
 	}
@@ -72,7 +77,8 @@ var FoodGenerator = (function (){
 
 	return {
 		generate : spawnInitialFood,
-		removeFood : removeFood
+		removeFood : removeFood,
+		redraw : redraw,
 	};
 
 })();

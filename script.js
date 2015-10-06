@@ -52,6 +52,9 @@ function startGame(){
 	//spawnInitialFood();
 	
 	spawnBug();
+	spawnBug();
+	spawnBug();
+//	setTimeout(spawnBug, getRandomSpawnTime());
 
 	var currentTime = GAME_TIME;
 	document.getElementById("timer-content").textContent = currentTime;
@@ -59,7 +62,7 @@ function startGame(){
 		if (gamePaused === true) return;
 
 		document.getElementById("timer-content").textContent = currentTime--; 
-		if (currentTime === 0){
+		if (currentTime <= 0 || foods.length <= 0){
 			gameOver();
 		}
 	}, 1000);
@@ -78,6 +81,8 @@ function startGame(){
 
 function gameOver(){
 	// Todo
+	gamePaused = true;
+	alert('perdeu');
 }
 
 function spawnBug(){
@@ -106,14 +111,9 @@ function spawnBug(){
 		updateBug(bug);
 	}, 1000/bug.velocity);
 	bugs.push(bug);
+	//setTimeout(spawnBug, getRandomSpawnTime());
 }
 
-function updateBugs(){
-	bugs.forEach(function (bug){
-		updateBug(bug);
-	});
-
-}
 
 /*
 *  Return the nearest food based on x and y position
@@ -180,7 +180,10 @@ function updateBug(bug){
 	FoodGenerator.redraw();
 
 	var nearestFood = getNearestFoodFrom(bug);
-
+	if (nearestFood === undefined) {
+		gameOver();
+		return ;
+	}
 
 	// check for collision
 	handleEat(bug, nearestFood);
@@ -191,7 +194,7 @@ function updateBug(bug){
 		moveForward();	
 	}
 	
-
+	if (foods.length <= 0) gameOver();
 
 	function moveForward(){
 		console.log("forward new")	
@@ -227,13 +230,16 @@ function updateBug(bug){
 		// check if it collides with other bug
 
 		// draw bug
-		ctx.fillStyle = "rgba(200, 45, 55, 1)";
-		ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
-
-		ctx.fillStyle = "rgba(0, 0, 0, 1)";
-		ctx.fillRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
+		redrawBug();
 
 		ctx.restore();
+		function redrawBug(){
+			ctx.fillStyle = "rgba(200, 45, 55, 1)";
+			ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+
+			ctx.fillStyle = "rgba(0, 0, 0, 1)";
+			ctx.fillRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
+		}
 	}
 
 
@@ -244,11 +250,8 @@ function updateBug(bug){
 			FoodGenerator.removeFood(nearestFood);
 		}
 	}
-
-
-
-
 }
+
 
 
 
@@ -283,7 +286,10 @@ function hasStrongCollision(obj1, obj2){
 }
 
 
-
+function getRandomSpawnTime(){
+	var times = [1000, 2000, 3000];
+	return times[getRandomNum(0, 2)];
+}
 function getRandomNum(min, max){
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }

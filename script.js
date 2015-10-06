@@ -145,14 +145,18 @@ function getBugArchetype(){
 	return bug;
 }
 function spawnBug(){
-	if (gamePaused===true) return;
+	setTimeout(spawnBug, getRandomSpawnTime());
+	if (gamePaused === true){
+		return;
+	}
+
 	var bugArchetype = getBugArchetype();
 	console.log(bugArchetype);
 
 	var bug = {
 		id: bugs.length,
 		x: getRandomNum(BUG_WIDTH/2, GAME_WIDTH - BUG_WIDTH/2),
-		y: -BUG_HEIGHT/2,
+		y: -BUG_HEIGHT,
 		velocity: bugArchetype.velocity[getSelectedLevel()],
 		width: BUG_WIDTH,
 		height: BUG_HEIGHT,
@@ -173,7 +177,6 @@ function spawnBug(){
 	ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
 
 	bugs.push(bug);
-	setTimeout(spawnBug, getRandomSpawnTime());
 }
 
 
@@ -205,7 +208,8 @@ function rotateBugToFood(nearestFood, bug){
 
 
 	// find the angle between the nearest food and the bug
-	var angle = findAngle(nearestFood.x + nearestFood.width/2, nearestFood.y + nearestFood.height/2,
+	var angle = findAngle(nearestFood.x + nearestFood.width/2,
+		 				  nearestFood.y + nearestFood.height/2,
 						  bug.x, bug.y);
 
 	//set a pivot in the middle of the bug
@@ -232,7 +236,7 @@ function rotateBugToFood(nearestFood, bug){
 }
 
 	function findAngle(x1,y1,x2,y2){
-		return theta = Math.atan2(y2-y1, x2-x1);
+		return Math.atan2(y2-y1, x2-x1);
 	}
 
 function updateBug(bug){

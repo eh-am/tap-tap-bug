@@ -155,8 +155,10 @@ function spawnBug(){
 
 	var bug = {
 		id: bugs.length,
-		x: getRandomNum(BUG_WIDTH/2, GAME_WIDTH - BUG_WIDTH/2),
-		y: -BUG_HEIGHT,
+		x: 100,
+		y: 100,
+		//x: getRandomNum(BUG_WIDTH/2, GAME_WIDTH - BUG_WIDTH/2),
+		//y: -BUG_HEIGHT,
 		velocity: bugArchetype.velocity[getSelectedLevel()],
 		width: BUG_WIDTH,
 		height: BUG_HEIGHT,
@@ -170,11 +172,11 @@ function spawnBug(){
 		format: "rectangle"
 	};
 
-	ctx.fillStyle = "rgba(" + bug.color + "," + bug.opacity + ")";
-	ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
+	// ctx.fillStyle = "rgba(" + bug.color + "," + bug.opacity + ")";
+	// ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
 
-	ctx.fillStyle = "rgba(0, 0, 0, 1)";
-	ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
+	// ctx.fillStyle = "rgba(0, 0, 0, 1)";
+	// ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
 
 	bugs.push(bug);
 }
@@ -226,11 +228,17 @@ function rotateBugToFood(nearestFood, bug){
 
 
 	// draw the bug
+	redrawBug(bug);
+//	var path = new Path2D();
+
+
+	/*
 	ctx.fillStyle = "rgba(" + bug.color + "," + bug.opacity + ")";
 	ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
 
 	ctx.fillStyle = "rgba(0, 0, 0, 1)";
 	ctx.fillRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
+*/
 
 	ctx.restore();
 }
@@ -355,20 +363,29 @@ function renderBug(bug){
 			});
 		}
 
-		redrawBug();
+		redrawBug(bug);
 		ctx.restore();
 
+}
+		function redrawBug(bug){
+			var pivotX = bug.x + bug.width/2;
+			var pivotY = bug.y + bug.height/2;
+			// var path = new Path2D();
+			// ctx.fillStyle = "rgba(" + bug.color + ", " + bug.opacity +")";
+			// //
 
+   //      	path.arc(bug.x, bug.y, 4, 0, 2 * Math.PI, false);
+   //      	path.ellipse(bug.x, bug.y, 13, 3, 90 * Math.PI/180, 0, 2 * Math.PI);
+   //      	ctx.fill(path);
 
-		function redrawBug(){
 			ctx.fillStyle = "rgba(" + bug.color + ", " + bug.opacity +")";
 			ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
 
 			ctx.fillStyle = "rgba(0, 0, 0, 1)";
 			ctx.fillRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
+			
 		}
 
-}
 
 
 /*

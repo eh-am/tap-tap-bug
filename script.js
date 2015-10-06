@@ -122,7 +122,8 @@ function getNearestFoodFrom(bug){
 	var nearestFood = foods[0];
 	foods.forEach(function (food){
 		var distance = getDistanceBetween(bug, food);
-		if (distance < getDistanceBetween(bug, nearestFood)){
+		if (distance < getDistanceBetween(bug, nearestFood) 
+			&& food.available === true){
 			nearestFood = food;
 		}
 	});

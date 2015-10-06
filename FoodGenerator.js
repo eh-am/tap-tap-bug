@@ -5,8 +5,16 @@ var FoodGenerator = (function (){
 	}
 	function redraw(){
 		foods.forEach(function (food){
-			ctx.fillStyle = "rgba(100, 100, 200, 0.5)";
+			ctx.fillStyle = "rgba(100, 100, 200, " + food.opacity + ")";			
 			ctx.fillRect(food.x, food.y, FOOD_WIDTH, FOOD_HEIGHT);
+			if (food.available === false) food.opacity -= 0.05;
+
+			if (food.opacity <= 0){ //if disappeared, stop drawing
+				foods = foods.filter(function (f){
+				if (f.id !== food.id) return true;
+					else return false;
+				});
+			}
 		});
 	}
 	function drawFood(){
@@ -22,7 +30,9 @@ var FoodGenerator = (function (){
 			var food = {
 				id: foods.length,
 				width: FOOD_WIDTH,
-				height: FOOD_HEIGHT
+				height: FOOD_HEIGHT,
+				opacity: 1,
+				available: true
 			};
 
 			food.x = getRandomNum(FOOD_WIDTH, GAME_WIDTH - FOOD_WIDTH);
@@ -52,11 +62,8 @@ var FoodGenerator = (function (){
 	function removeFood(food){
 		//TODO
 		console.log("removendo comida ");
-		ctx.clearRect(food.x, food.y, FOOD_WIDTH, FOOD_HEIGHT);
-		foods = foods.filter(function (f){
-			if (f.id !== food.id) return true;
-			else return false;
-		});
+		food.available = false;
+		//ctx.clearRect(food.x, food.y, FOOD_WIDTH, FOOD_HEIGHT);
 	}
 
 	function hasFoodCollision(obj1, obj2){

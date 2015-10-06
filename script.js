@@ -3,6 +3,7 @@
 var GAME_WIDTH = 400;
 var GAME_HEIGHT = 600;
 var GAME_TIME = 60;
+var GAME_FPS = 70;
 
 var FOOD_WIDTH = 20;
 var FOOD_HEIGHT = 20;
@@ -14,7 +15,11 @@ var game = document.getElementById("game");
 var ctx = game.getContext('2d');
 var foods = [];
 var bugs = [];
-
+var BUGS_ARCHETYPES = [
+	{color: "0, 0, 0", velocity: [150, 200], score: 5, probability: [0, 3]}, //red
+	{color: "192, 57, 43", velocity: [75, 100], score: 3, probability: [3, 6]} ,//red
+	{color: "230, 126, 34", velocity: [60, 80], score: 1, probability: [6, 11]} //orange
+];
 
 var gamePaused = false;
 
@@ -51,10 +56,8 @@ function startGame(){
 	FoodGenerator.generate();
 	//spawnInitialFood();
 	
-	spawnBug();
-	spawnBug();
-	spawnBug();
-//	setTimeout(spawnBug, getRandomSpawnTime());
+	//spawnBug();
+	setTimeout(spawnBug, getRandomSpawnTime());
 
 	var currentTime = GAME_TIME;
 	document.getElementById("timer-content").textContent = currentTime;
@@ -77,41 +80,65 @@ function startGame(){
 		}
 
 	});
+
+	setInterval(gameLoop, 1000/GAME_FPS);
 }
 
 function gameOver(){
 	// Todo
 	gamePaused = true;
-	alert('perdeu');
 }
 
+function gameLoop(){
+	if (gamePaused === true) return;
+	ctx.clearRect(0,0, GAME_WIDTH, GAME_HEIGHT);
+	FoodGenerator.redraw();
+
+
+	bugs.forEach(function (bug){
+		updateBug(bug); // update bug position
+		renderBug(bug); // redraw bug
+	});
+	if (foods.length <= 0) gameOver();
+}
+
+function getBugArchetype(){
+	var r = getRandomNum(0, 10);
+	var bug;
+	BUGS_ARCHETYPES.forEach(function (b){
+		if (r >= b.probability[0] && r < b.probability[1]){
+			bug = b;
+		}
+	});
+	return bug;
+}
 function spawnBug(){
+	if (gamePaused===true) return;
+	var bugArchetype = getBugArchetype();
+	console.log(bugArchetype);
+
 	var bug = {
+		id: bugs.length,
 		x: getRandomNum(BUG_WIDTH/2, GAME_WIDTH - BUG_WIDTH/2),
 		y: -BUG_HEIGHT/2,
-		velocity: 75,
+		velocity: bugArchetype.velocity[getSelectedLevel()],
 		width: BUG_WIDTH,
 		height: BUG_HEIGHT,
+		color: bugArchetype.color,
 		rotation: 0,
-		needsRotation: false,
 		angle : 0,
 		movedY: false,
 		format: "rectangle"
 	};
 
-	ctx.fillStyle = "rgba(200, 45, 55, 1)";
+	ctx.fillStyle = "rgba(" + bug.color + ", 1)";
 	ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
 
 	ctx.fillStyle = "rgba(0, 0, 0, 1)";
 	ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
 
-	var t = 0; 
-	var km = 0;
-	setInterval(function (){
-		updateBug(bug);
-	}, 1000/bug.velocity);
 	bugs.push(bug);
-	//setTimeout(spawnBug, getRandomSpawnTime());
+	setTimeout(spawnBug, getRandomSpawnTime());
 }
 
 
@@ -160,7 +187,7 @@ function rotateBugToFood(nearestFood, bug){
 
 
 	// draw the bug
-	ctx.fillStyle = "rgba(200, 45, 55, 1)";
+	ctx.fillStyle = "rgba(" + bug.color + ", 1)";
 	ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
 
 	ctx.fillStyle = "rgba(0, 0, 0, 1)";
@@ -174,11 +201,6 @@ function rotateBugToFood(nearestFood, bug){
 	}
 
 function updateBug(bug){
-	if (gamePaused === true) return;
-	
-	ctx.clearRect(0,0, GAME_WIDTH, GAME_HEIGHT);
-	FoodGenerator.redraw();
-
 	var nearestFood = getNearestFoodFrom(bug);
 	if (nearestFood === undefined) {
 		gameOver();
@@ -189,25 +211,49 @@ function updateBug(bug){
 	handleEat(bug, nearestFood);
 
 	rotateBugToFood(nearestFood, bug);
+
+
 	// if it's aligned
 	if (parseInt(bug.angle) === parseInt(bug.angleDesired)){
 		moveForward();	
 	}
 	
-	if (foods.length <= 0) gameOver();
 
 	function moveForward(){
 		console.log("forward new")	
-		ctx.save();
-		var pivotX = bug.x + bug.width/2;
-		var pivotY = bug.y + bug.height/2;
+	
 
-		ctx.translate(pivotX, pivotY);
-		ctx.rotate(bug.angle);
-
+		var nearestFood = getNearestFoodFrom(bug);
 		
 		var moveX = (Math.sign((nearestFood.x + nearestFood.width/2) - (bug.x + bug.width/2)));					
 		var moveY = (Math.sign((nearestFood.y + nearestFood.height/2) - (bug.y + bug.height)));
+
+		moveX *= bug.velocity/GAME_FPS;
+		moveY *= bug.velocity/GAME_FPS;
+
+		var futureBug = {
+			id: bug.id,
+			x: bug.x + moveX*2,
+			y: bug.y + moveY*2,
+			width: BUG_WIDTH,
+			height: BUG_HEIGHT,
+			format: 'rectangle'
+		}
+
+		// if it's going to collide, dont't move
+		for (var i = 0; i < bugs.length; i++){			
+			if (bugs[i].id === futureBug.id) continue; //if it's the same bug
+			if (hasStrongCollision(futureBug, bugs[i]) === true){
+				// if it's next to the food than the other bug, continue
+				if (getDistanceBetween(futureBug, nearestFood) >= getDistanceBetween(bugs[i], nearestFood)){
+					return;
+				}
+				
+			}
+		}
+		
+		// TODO
+		// check if it collides with other bug
 
 		// alternates movement between X and Y
 		if (bug.movedY === true){ 
@@ -222,24 +268,16 @@ function updateBug(bug){
 				bug.y += moveY;
 				bug.movedY = true;
 			}else{ //se nao precisa andar em y
-				bug.x += (Math.sign((nearestFood.x + nearestFood.width/2) - (bug.x + bug.width/2)));	
+				bug.x += moveX;
 			}
 		}
-		
-		// TODO
-		// check if it collides with other bug
+
+
 
 		// draw bug
-		redrawBug();
+		//redrawBug();
 
-		ctx.restore();
-		function redrawBug(){
-			ctx.fillStyle = "rgba(200, 45, 55, 1)";
-			ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
 
-			ctx.fillStyle = "rgba(0, 0, 0, 1)";
-			ctx.fillRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
-		}
 	}
 
 
@@ -252,7 +290,28 @@ function updateBug(bug){
 	}
 }
 
+function renderBug(bug){
+		ctx.save();
 
+		var pivotX = bug.x + bug.width/2;
+		var pivotY = bug.y + bug.height/2;
+		ctx.translate(pivotX, pivotY);
+		ctx.rotate(bug.angle);
+
+		redrawBug();
+		ctx.restore();
+
+
+
+		function redrawBug(){
+			ctx.fillStyle = "rgba(" + bug.color + ", 1)";
+			ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
+
+			ctx.fillStyle = "rgba(0, 0, 0, 1)";
+			ctx.fillRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
+		}
+
+}
 
 
 /*

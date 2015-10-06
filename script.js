@@ -155,10 +155,10 @@ function spawnBug(){
 
 	var bug = {
 		id: bugs.length,
-		x: 100,
-		y: 100,
-		//x: getRandomNum(BUG_WIDTH/2, GAME_WIDTH - BUG_WIDTH/2),
-		//y: -BUG_HEIGHT,
+		// x: 100,
+		// y: 100,
+		x: getRandomNum(BUG_WIDTH/2, GAME_WIDTH - BUG_WIDTH/2),
+		y: -BUG_HEIGHT,
 		velocity: bugArchetype.velocity[getSelectedLevel()],
 		width: BUG_WIDTH,
 		height: BUG_HEIGHT,
@@ -370,20 +370,59 @@ function renderBug(bug){
 		function redrawBug(bug){
 			var pivotX = bug.x + bug.width/2;
 			var pivotY = bug.y + bug.height/2;
-			// var path = new Path2D();
-			// ctx.fillStyle = "rgba(" + bug.color + ", " + bug.opacity +")";
-			// //
 
-   //      	path.arc(bug.x, bug.y, 4, 0, 2 * Math.PI, false);
-   //      	path.ellipse(bug.x, bug.y, 13, 3, 90 * Math.PI/180, 0, 2 * Math.PI);
-   //      	ctx.fill(path);
-
+			var path = new Path2D();
 			ctx.fillStyle = "rgba(" + bug.color + ", " + bug.opacity +")";
-			ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
 
-			ctx.fillStyle = "rgba(0, 0, 0, 1)";
-			ctx.fillRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
+			ctx.globalAlpha = bug.opacity;
 			
+			//draws the head
+			path.arc(0,
+					 (bug.y + bug.height) - pivotY,
+					 BUG_WIDTH - 4,
+					 0,
+					 2 * Math.PI);
+
+			path.ellipse(0, 0, BUG_WIDTH/2, BUG_HEIGHT - 13, 0, 0, 2 * Math.PI);
+			//path.ellipse(pivotX, pivotY)
+        	//path.arc(bug.x - pivotX, bug.y - pivotY, 4, 0, 2 * Math.PI, false);
+        	//path.ellipse(bug.x - pivotX, bug.y - pivotY, 13, 3, 90 * Math.PI/180, 0, 2 * Math.PI);
+        	ctx.fill(path);
+        	
+        	//ctx.restore();
+			
+			ctx.fillStyle = "rgba(" + bug.color + ", " + bug.opacity +")";
+        	ctx.beginPath();
+
+        	var pivotLegs = {
+        		x: 0,
+        		y: -10
+        	};
+        
+        	// draw the legs
+        	for (var i = 0; i < 3; i++, pivotLegs.y += 15){
+	        	ctx.moveTo(pivotLegs.x, pivotLegs.y);
+	        	ctx.lineTo(pivotLegs.x - bug.width, pivotLegs.y - 10);
+	        	ctx.moveTo(pivotLegs.x - bug.width, pivotLegs.y - 10);
+	        	ctx.lineTo(pivotLegs.x - bug.width, pivotLegs.y - 16);
+
+				ctx.moveTo(pivotLegs.x, pivotLegs.y);	
+	        	ctx.lineTo(pivotLegs.x + bug.width, pivotLegs.y - 10);   
+	        	ctx.moveTo(pivotLegs.x + bug.width, pivotLegs.y - 10);
+	        	ctx.lineTo(pivotLegs.x + bug.width, pivotLegs.y - 16);     	
+	
+        	}
+        	
+
+        	// draw the antennas
+        	ctx.moveTo(0, 20);
+        	ctx.lineTo(10, 30)
+        	
+        	ctx.moveTo(0, 20);
+        	ctx.lineTo(-10, 30)
+
+			ctx.strokeStyle = "rgba(" + bug.color + ", " + bug.opacity +")";
+        	ctx.stroke();
 		}
 
 

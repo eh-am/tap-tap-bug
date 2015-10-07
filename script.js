@@ -4,6 +4,7 @@ var GAME_WIDTH = 400;
 var GAME_HEIGHT = 600;
 var GAME_TIME = 60;
 var GAME_FPS = 70;
+var GAME_BACKGROUND = "236, 240, 241";
 var gameScore = 0;
 
 var FOOD_WIDTH = 20;
@@ -124,7 +125,7 @@ function gameOver(){
 function gameLoop(){
 	if (gamePaused === true) return;
 	ctx.clearRect(0,0, GAME_WIDTH, GAME_HEIGHT);
-	ctx.fillStyle = "rgb(236, 240, 241)";
+	ctx.fillStyle = "rgb(" + GAME_BACKGROUND + ")";
 	ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
 	FoodGenerator.redraw();

@@ -5,8 +5,49 @@ var FoodGenerator = (function (){
 	}
 	function redraw(){
 		foods.forEach(function (food){
-			ctx.fillStyle = "rgba(100, 100, 200, " + food.opacity + ")";			
-			ctx.fillRect(food.x, food.y, FOOD_WIDTH, FOOD_HEIGHT);
+			ctx.save();
+			var path = new Path2D();
+
+			// draw a circle outside
+			ctx.fillStyle = "rgba(141,110,81, " + food.opacity + ")";	
+			path.arc(food.x + food.width/2, food.y + food.height/2, 10, 0, 2 * Math.PI);	
+			ctx.fill(path);
+			ctx.restore();
+
+			// draw the circle inside
+			path = new Path2D();
+			ctx.fillStyle = "rgba(" + GAME_BACKGROUND + "," + food.opacity + ")";	
+			path.arc(food.x + food.width/2, food.y + food.height/2, 4, 0, 2 * Math.PI);	
+			ctx.fill(path);
+
+			// draw the sugar
+			ctx.strokeStyle = "rgba(0, 255,0, 1)";
+			ctx.lineWidth = 2;
+			ctx.beginPath();			
+			ctx.moveTo(food.x + food.width/2 - 2, food.y + 3);
+	        ctx.lineTo(food.x + food.width/2 - 5, food.y + 6);
+			ctx.stroke();
+
+
+			ctx.beginPath();
+			ctx.strokeStyle = "rgba(238, 200, 153, 1)";
+	        ctx.moveTo(food.x + food.width/2 + 5, food.y + 3);
+	        ctx.lineTo(food.x + food.width/2 + 8, food.y + 8);
+			ctx.stroke();
+
+			ctx.beginPath();
+			ctx.strokeStyle = "rgba(231, 126, 200,1.0)";
+	        ctx.moveTo(food.x + 2, food.y + food.height/2);
+	        ctx.lineTo(food.x + 5, food.y + food.height/2 + 5);			
+			ctx.stroke();
+
+			ctx.beginPath();
+			ctx.strokeStyle = "rgba(252, 255, 255,1.0)";
+	        ctx.moveTo(food.x + food.width/2, food.y + food.height - 2);
+	        ctx.lineTo(food.x + food.width/2 + 6, food.y + food.height - 6)		
+			ctx.stroke();
+
+
 			if (food.available === false) food.opacity -= 0.05;
 
 			if (food.opacity <= 0){ //if disappeared, stop drawing
@@ -16,6 +57,7 @@ var FoodGenerator = (function (){
 				});
 			}
 		});
+		ctx.restore();
 	}
 	function drawFood(){
 		var newFood = generateFoodPosition();

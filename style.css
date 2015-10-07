@@ -52,12 +52,16 @@ body{
 	text-shadow: 2px 2px 3px #696969;
 	animation: pulse 1s linear infinite;
 }
+
 @keyframes pulse{
 	from { transform: scale(1); }
 	50% { transform: scale(1.5); }
 	to { transform: scale(1); }
 }
 
+.pulse-once{
+	animation: pulse 1s linear;	
+}
 #info-bar {
 	display: -webkit-flex;
 	display: flex;

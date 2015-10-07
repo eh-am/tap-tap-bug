@@ -44,9 +44,6 @@ startButton.addEventListener("click", function (e){
 });
 
 function getSelectedLevel(){
-
-
-
 	var selectedValue = document.startPageForm['level'].value;
 	return selectedValue;
 }
@@ -54,6 +51,12 @@ function getSelectedLevel(){
 function updateScore(score){
 	gameScore += score;
 	document.getElementById("score-content").textContent = gameScore;
+
+	if (gameScore > localStorage.getItem("ttb-highScore")){
+		// adds a pulse effect when the reaches a new high score
+		document.getElementById("score-content").className = "pulse-once";
+	}
+	
 }
 
 

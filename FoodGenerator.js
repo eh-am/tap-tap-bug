@@ -21,30 +21,30 @@ var FoodGenerator = (function (){
 			ctx.fill(path);
 
 			// draw the sugar
-			ctx.strokeStyle = "rgba(0, 255,0, 1)";
+			ctx.strokeStyle = "rgba(0, 255,0," + food.opacity + ")";
 			ctx.lineWidth = 2;
 			ctx.beginPath();			
 			ctx.moveTo(food.x + food.width/2 - 2, food.y + 3);
-	        ctx.lineTo(food.x + food.width/2 - 5, food.y + 6);
+	        ctx.lineTo(food.x + food.width/2 - 4, food.y + 4);
 			ctx.stroke();
 
 
 			ctx.beginPath();
-			ctx.strokeStyle = "rgba(238, 200, 153, 1)";
+			ctx.strokeStyle = "rgba(238, 200, 153," + food.opacity + ")";
 	        ctx.moveTo(food.x + food.width/2 + 5, food.y + 3);
-	        ctx.lineTo(food.x + food.width/2 + 8, food.y + 8);
+	        ctx.lineTo(food.x + food.width/2 + 7, food.y + 6);
 			ctx.stroke();
 
 			ctx.beginPath();
-			ctx.strokeStyle = "rgba(231, 126, 200,1.0)";
+			ctx.strokeStyle = "rgba(231, 126, 200," + food.opacity + ")";
 	        ctx.moveTo(food.x + 2, food.y + food.height/2);
-	        ctx.lineTo(food.x + 5, food.y + food.height/2 + 5);			
+	        ctx.lineTo(food.x + 3, food.y + food.height/2 + 5);			
 			ctx.stroke();
 
 			ctx.beginPath();
-			ctx.strokeStyle = "rgba(252, 255, 255,1.0)";
+			ctx.strokeStyle = "rgba(252, 255, 255, " + food.opacity + ")";
 	        ctx.moveTo(food.x + food.width/2, food.y + food.height - 2);
-	        ctx.lineTo(food.x + food.width/2 + 6, food.y + food.height - 6)		
+	        ctx.lineTo(food.x + food.width/2 + 3, food.y + food.height - 4)		
 			ctx.stroke();
 
 

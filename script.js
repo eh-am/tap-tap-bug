@@ -25,6 +25,17 @@ var BUGS_ARCHETYPES = [
 
 var gamePaused = false;
 
+/**
+* Prepare some stuff
+*/
+var init = function(){
+	/* set the highscore */
+	var highScore = localStorage.getItem("ttb-highScore") || 0;
+	document.getElementById("highScore").textContent = highScore;
+	
+	
+}();
+
 var startButton = document.getElementById("startGameButton");
 startButton.addEventListener("click", function (e){
 	e.preventDefault();
@@ -117,7 +128,19 @@ function killBug(bug){
 
 }
 
+
+/*
+*	Updates the highscore if necessary
+*/
+function setNewHighScore(highScore){
+	var oldHighScore = localStorage.getItem("ttb-highScore");
+	if (highScore > oldHighScore){
+		localStorage.setItem("ttb-highScore", highScore)
+	}
+}
+
 function gameOver(){
+	setNewHighScore(gameScore);
 	// Todo
 	gamePaused = true;
 }
@@ -229,9 +252,9 @@ function rotateBugToFood(nearestFood, bug){
 	ctx.restore();
 }
 
-	function findAngle(x1,y1,x2,y2){
-		return Math.atan2(y2-y1, x2-x1);
-	}
+function findAngle(x1,y1,x2,y2){
+	return Math.atan2(y2-y1, x2-x1);
+}
 
 function updateBug(bug){
 	var nearestFood = getNearestFoodFrom(bug);
@@ -442,7 +465,7 @@ function getRandomNum(min, max){
 }
 
 
-startGame();
+//startGame();
 
 
 

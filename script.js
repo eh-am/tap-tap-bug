@@ -267,14 +267,12 @@ function updateBug(bug){
 		moveX *= bug.velocity/GAME_FPS;
 		moveY *= bug.velocity/GAME_FPS;
 
-		console.log(moveX);
-		console.log(moveY);
 
 		var futureBug = {
 			id: bug.id,
 			velocity: bug.velocity,
-			x: bug.x + moveX*2,
-			y: bug.y + moveY*2,
+			x: bug.x + moveX * 2,
+			y: bug.y + moveY * 2,
 			width: BUG_WIDTH,
 			height: BUG_HEIGHT,
 			format: 'rectangle'
@@ -297,13 +295,14 @@ function updateBug(bug){
 		
 
 		// if it has to move in X and Y
-		if (moveY > 0 && moveX > 0){
+		if (parseInt(moveY) !== 0 && parseInt(moveX ) !== 0){
 			// walks half of it should be (to not disrespect the velocity)
 			bug.y += moveY/2;
 			bug.x += moveX/2;
 		}else {
-			bug.y += moveY;
-			bug.x += moveX;	
+			// walks only in one direction (parseInt casts to 0 when it's almost 0)
+			bug.y += parseInt(moveY);
+			bug.x += parseInt(moveX);	
 		}
 
 	}

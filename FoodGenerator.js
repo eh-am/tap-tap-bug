@@ -28,19 +28,21 @@ var FoodGenerator = (function (){
 	        ctx.lineTo(food.x + food.width/2 - 4, food.y + 4);
 			ctx.stroke();
 
-
+			// draw the sugar
 			ctx.beginPath();
 			ctx.strokeStyle = "rgba(238, 200, 153," + food.opacity + ")";
 	        ctx.moveTo(food.x + food.width/2 + 5, food.y + 3);
 	        ctx.lineTo(food.x + food.width/2 + 7, food.y + 6);
 			ctx.stroke();
 
+			// draw the sugar
 			ctx.beginPath();
 			ctx.strokeStyle = "rgba(231, 126, 200," + food.opacity + ")";
 	        ctx.moveTo(food.x + 2, food.y + food.height/2);
 	        ctx.lineTo(food.x + 3, food.y + food.height/2 + 5);			
 			ctx.stroke();
 
+			// draw the sugar
 			ctx.beginPath();
 			ctx.strokeStyle = "rgba(252, 255, 255, " + food.opacity + ")";
 	        ctx.moveTo(food.x + food.width/2, food.y + food.height - 2);

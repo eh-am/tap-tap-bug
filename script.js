@@ -125,6 +125,8 @@ function gameOver(){
 function gameLoop(){
 	if (gamePaused === true) return;
 	ctx.clearRect(0,0, GAME_WIDTH, GAME_HEIGHT);
+
+	// craws the background
 	ctx.fillStyle = "rgb(" + GAME_BACKGROUND + ")";
 	ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
@@ -159,8 +161,6 @@ function spawnBug(){
 
 	var bug = {
 		id: bugs.length,
-		// x: 100,
-		// y: 100,
 		x: getRandomNum(BUG_WIDTH/2, GAME_WIDTH - BUG_WIDTH/2),
 		y: -BUG_HEIGHT,
 		velocity: bugArchetype.velocity[getSelectedLevel()],
@@ -175,12 +175,6 @@ function spawnBug(){
 		score: bugArchetype.score,
 		format: "rectangle"
 	};
-
-	// ctx.fillStyle = "rgba(" + bug.color + "," + bug.opacity + ")";
-	// ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
-
-	// ctx.fillStyle = "rgba(0, 0, 0, 1)";
-	// ctx.fillRect(bug.x + bug.width/2, bug.y + bug.height, 2, 2);	//a black dot to show the bug's direction
 
 	bugs.push(bug);
 }
@@ -209,9 +203,11 @@ function getNearestFoodFrom(bug){
 		return Math.sqrt(v1 + v2, 2);
 	}
 
+/*
+* Rotate the bug towards the nearest food
+*/
 function rotateBugToFood(nearestFood, bug){
 	ctx.save();
-
 
 	// find the angle between the nearest food and the bug
 	var angle = findAngle(nearestFood.x + nearestFood.width/2,
@@ -222,27 +218,13 @@ function rotateBugToFood(nearestFood, bug){
 	var pivotX = bug.x + bug.width/2;
 	var pivotY = bug.y + bug.height/2;
 
-
+	// 
 	bug.angleDesired = (angle + 0.5 * Math.PI);	
-	bug.angle += (Math.sign(bug.angleDesired - bug.angle) * Math.PI/180);
-
-
+	bug.angle += (Math.sign(bug.angleDesired - bug.angle) * Math.PI/180);	
+	
 	ctx.translate(pivotX, pivotY);
 	ctx.rotate(bug.angle);
 
-
-	// draw the bug
-	redrawBug(bug);
-//	var path = new Path2D();
-
-
-	/*
-	ctx.fillStyle = "rgba(" + bug.color + "," + bug.opacity + ")";
-	ctx.fillRect(bug.x - pivotX, bug.y - pivotY, bug.width, bug.height);
-
-	ctx.fillStyle = "rgba(0, 0, 0, 1)";
-	ctx.fillRect((bug.x + bug.width/2) - pivotX, (bug.y + bug.height) - pivotY, 2, 2);
-*/
 
 	ctx.restore();
 }
@@ -274,16 +256,19 @@ function updateBug(bug){
 	
 
 	function moveForward(){
-		console.log("forward new")	
-	
-
 		var nearestFood = getNearestFoodFrom(bug);
 		
-		var moveX = (Math.sign((nearestFood.x + nearestFood.width/2) - (bug.x + bug.width/2)));					
-		var moveY = (Math.sign((nearestFood.y + nearestFood.height/2) - (bug.y + bug.height)));
+		// fix flickering when angle desired is next to 0
+		var rX = (nearestFood.x + nearestFood.width/2) - (bug.x + bug.width/2);
+		var rY = (nearestFood.y + nearestFood.height/2) - (bug.y + bug.height);
+		var moveX = (parseInt(rX) === 0) ? 0 : (Math.sign((nearestFood.x + nearestFood.width/2) - (bug.x + bug.width/2)));	
+		var moveY = (parseInt(rY) === 0) ? 0 : (Math.sign((nearestFood.y + nearestFood.height/2) - (bug.y + bug.height)));
 
 		moveX *= bug.velocity/GAME_FPS;
 		moveY *= bug.velocity/GAME_FPS;
+
+		console.log(moveX);
+		console.log(moveY);
 
 		var futureBug = {
 			id: bug.id,
@@ -298,10 +283,11 @@ function updateBug(bug){
 		// if it's going to collide, dont't move
 		for (var i = 0; i < bugs.length; i++){			
 			if (bugs[i].id === futureBug.id) continue; //if it's the same bug
-			if (hasStrongCollision(futureBug, bugs[i]) === true){
-				// if it's next to the food than the other bug, continue
-				if (futureBug.velocity > bugs[i].velocity) continue;
+			if (hasStrongCollision(futureBug, bugs[i]) === true){				
+				// the bigger velocity prevails
+				if (futureBug.velocity >= bugs[i].velocity) continue;
 
+				// if it's far away frmo the food than the bug, don't move
 				if (getDistanceBetween(futureBug, nearestFood) >= getDistanceBetween(bugs[i], nearestFood)){
 					return;
 				}
@@ -309,31 +295,16 @@ function updateBug(bug){
 			}
 		}
 		
-		// TODO
-		// check if it collides with other bug
 
-		// alternates movement between X and Y
-		if (bug.movedY === true){ 
-			if (parseInt(moveX) !== 0){ //if it's X turn and it has something to do
-				bug.x += moveX;
-				bug.movedY = false;
-			}else{ // it's x turn but it's already aligned on x
-				bug.y += moveY;
-			}
-		}else{
-			if (parseInt(moveY) !== 0){
-				bug.y += moveY;
-				bug.movedY = true;
-			}else{ //se nao precisa andar em y
-				bug.x += moveX;
-			}
+		// if it has to move in X and Y
+		if (moveY > 0 && moveX > 0){
+			// walks half of it should be (to not disrespect the velocity)
+			bug.y += moveY/2;
+			bug.x += moveX/2;
+		}else {
+			bug.y += moveY;
+			bug.x += moveX;	
 		}
-
-
-
-		// draw bug
-		//redrawBug();
-
 
 	}
 

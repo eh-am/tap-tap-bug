@@ -2,7 +2,7 @@
 
 var GAME_WIDTH = 400;
 var GAME_HEIGHT = 600;
-var GAME_TIME = 10; //TODO: remove
+var GAME_TIME = 60;
 var GAME_FPS = 60;
 var GAME_BACKGROUND = "242, 241, 239";
 var gameScore = 0;

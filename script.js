@@ -2,9 +2,9 @@
 
 var GAME_WIDTH = 400;
 var GAME_HEIGHT = 600;
-var GAME_TIME = 60;
+var GAME_TIME = 10; //TODO: remove
 var GAME_FPS = 60;
-var GAME_BACKGROUND = "236, 240, 241";
+var GAME_BACKGROUND = "242, 241, 239";
 var gameScore = 0;
 
 var FOOD_WIDTH = 20;
@@ -35,8 +35,23 @@ var init = function(){
 	/* set the highscore */
 	var highScore = localStorage.getItem("ttb-highScore") || 0;
 	document.getElementById("highScore").textContent = highScore;
+
+	document.getElementById("try-again").addEventListener("click", function(){
+		destroyEverything();
+		startGame();
+	});
+
+	document.getElementById("exit").addEventListener("click", function(){
+		setNewHighScore(gameScore);
+		destroyEverything();
+		showInitialScreen();
+	});
 }();
 
+function showInitialScreen(){
+	document.getElementById("game-wrapper").className = "hide";
+	document.getElementById("start-page").className = "";
+}
 
 
 var startButton = document.getElementById("startGameButton");
@@ -48,7 +63,7 @@ startButton.addEventListener("click", function (e){
 
 function getSelectedLevel(){
 	var selectedValue = document.startPageForm['level'].value;
-	return selectedValue;
+	return parseInt(selectedValue);
 }
 
 function updateScore(score){
@@ -65,31 +80,44 @@ function updateScore(score){
 
 
 function startGame(){
-	document.getElementById("game-wrapper").className = "";
+	
 	var selectedLevel = getSelectedLevel();
+
+	document.getElementById("game-wrapper").className = "";
 	document.getElementById("start-page").className = "hide";
 	document.getElementById("pop-up").className = "hide";
+		document.getElementById("intro-pop-up").className = "pop-up";
+	document.getElementById("intro-pop-up-content").textContent = "Level " + selectedLevel;
+	//document.getElementById("intro-pop-up").className = "slowly-disappear";
 
-	ctx.canvas.width = GAME_WIDTH;
-	ctx.canvas.height = GAME_HEIGHT;
+	setTimeout(function (){
+		document.getElementById("intro-pop-up").className = "hide";
 
-	ctx.fillStyle = "rgba(255, 255, 230, 0.5)";
-	ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-	
+		ctx.canvas.width = GAME_WIDTH;
+		ctx.canvas.height = GAME_HEIGHT;
 
-	FoodGenerator.generate();
+		ctx.fillStyle = "rgba(255, 255, 230, 0.5)";
+		ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+		
 
-	setTimeout(spawnBug, getRandomSpawnTime());
+		FoodGenerator.generate();
 
-	currentTime = GAME_TIME;
-	document.getElementById("timer-content").textContent = currentTime--; // sets game time
-	handleTimerId = setInterval(handleTimer, 1000); // updates game time
+		setTimeout(spawnBug, getRandomSpawnTime());
+
+		currentTime = GAME_TIME;
+		document.getElementById("timer-content").textContent = currentTime--; // sets game time
+		handleTimerId = setInterval(handleTimer, 1000); // updates game time
 
 
-	document.getElementById("pause-play").addEventListener("click", handlePauseButton);
-	document.addEventListener("click", handleKillClick);
+		document.getElementById("pause-play").addEventListener("click", handlePauseButton);
+		document.addEventListener("click", handleKillClick);
 
-	gameLoopId = setInterval(gameLoop, 1000/GAME_FPS);
+		gameLoopId = setInterval(gameLoop, 1000/GAME_FPS);
+
+
+	}, 4000);
+
+
 }
 
 
@@ -141,6 +169,7 @@ function setNewHighScore(highScore){
 	var oldHighScore = localStorage.getItem("ttb-highScore");
 	if (highScore > oldHighScore){
 		localStorage.setItem("ttb-highScore", highScore)
+		document.getElementById("highScore").textContent = highScore;
 	}
 }
 
@@ -149,29 +178,40 @@ function destroyEverything(){
 	bugs = [];
 	gamePaused = false;
 	gameScore = 0;
+	document.getElementById("score-content").textContent = 0;
 
 	clearInterval(handleTimerId);
 	clearInterval(gameLoopId);
 
 }
 
+function startNewLevel(){
+	destroyEverything();
+
+	document.getElementById("level1").checked = false;
+	document.getElementById("level2").checked = true;
+	startGame();
+}
 
 function gameOver(){
 	setNewHighScore(gameScore);
-	document.getElementById("pop-up").className = "";
-	document.getElementById("try-again").addEventListener("click", function(){
-		destroyEverything();
-		startGame();
-	});
-	// Todo
-	gamePaused = true;
+
+	if (currentTime <= 0 &&
+		foods.length > 0 && 
+		getSelectedLevel() === 1){ //if finished first stage
+		startNewLevel();
+	}else{
+		document.getElementById("high-score-pop-up").textContent = gameScore;
+		document.getElementById("pop-up").className = "pop-up";
+		gamePaused = true;
+	}
 }
 
 function gameLoop(){
 	if (gamePaused === true) return;
 	ctx.clearRect(0,0, GAME_WIDTH, GAME_HEIGHT);
 
-	// craws the background
+	// draws the background
 	ctx.fillStyle = "rgb(" + GAME_BACKGROUND + ")";
 	ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
@@ -197,11 +237,10 @@ function getBugArchetype(){
 }
 
 function spawnBug(){
-	
-	if (gamePaused === true){
-		return;
-	}
-	
+	// do nothing if the game is paused
+	if (gamePaused === true) return;
+
+	// each bug triggers the spawner for the next one
 	setTimeout(spawnBug, getRandomSpawnTime());
 
 	var bugArchetype = getBugArchetype();

@@ -5,6 +5,12 @@
 .container{
 	max-width: 400px;
 	margin: 0 auto;
+
+}
+
+#game-wrapper .container{
+	background: rgb(242, 241, 239);
+	height: 644px; /* canvas + infobar */
 }
 
 body{
@@ -65,7 +71,7 @@ body{
 #info-bar {
 	display: -webkit-flex;
 	display: flex;
-	background-color: #f39c12;
+	background-color: #8e44ad;
 	color: white;
 	
 	width: 400px;
@@ -82,7 +88,7 @@ body{
 	display: none;
 }
 
-#pop-up{
+.pop-up{
 	font-family: Verdana, sans-serif;
 	background: #f1c40f;
 	text-align: center;
@@ -99,6 +105,15 @@ body{
     height: 50%;
 }
 
+.slowly-disappear{
+	opacity: 0 !important;
+	transition: opacity 1s ease;
+}
+
+#intro-pop-up{
+	opacity: 1;
+	height: 100px;
+}
 #pop-up h1{
 	font-family: 'Walter Turncoat', cursive;
 

@@ -105,9 +105,7 @@ var FoodGenerator = (function (){
 
 	function removeFood(food){
 		//TODO
-		console.log("removendo comida ");
 		food.available = false;
-		//ctx.clearRect(food.x, food.y, FOOD_WIDTH, FOOD_HEIGHT);
 	}
 
 	function hasFoodCollision(obj1, obj2){

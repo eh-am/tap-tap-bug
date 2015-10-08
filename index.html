@@ -43,13 +43,16 @@
 	<div id="game-wrapper" class="hide">
 		<div class="container">
 			<div id="info-bar">
-				<div id="timer"><span id="timer-content"></span><label for="timer"> sec</label></div>
+				<div id="timer"><span id="timer-content">0</span><label for="timer"> sec</label></div>
 				<div id="pause-play">&#10074;&#10074;</div>
 				<div id="score"><label for="score">Score: </label><span id="score-content">0</span></div>
 			</div>
 			<canvas id="game"></canvas>
 
-			<div id="pop-up">
+			<div id="intro-pop-up" class="pop-up">
+				<h1 id="intro-pop-up-content">LEVEL 1</h1>
+			</div>
+			<div id="pop-up" class="pop-up">
 				<h1>Game Over</h1>
 				<div class="high-score">
 					<label for="high-score-pop-up">Score</label>

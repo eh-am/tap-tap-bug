@@ -20,7 +20,7 @@
 					<label for="high-score">High Score</label>
 					<div id="highScore"> 0</div>	
 				</div>
-				<button id="startGameButton">Start Game</button>	
+				<button id="startGameButton" class="button">Start Game</button>	
 
 				<div class="level-select">
 					<label for="level">Level:</label>
@@ -48,6 +48,17 @@
 				<div id="score"><label for="score">Score: </label><span id="score-content">0</span></div>
 			</div>
 			<canvas id="game"></canvas>
+
+			<div id="pop-up">
+				<h1>Game Over</h1>
+				<div class="high-score">
+					<label for="high-score-pop-up">Score</label>
+					<div id="high-score-pop-up" class="pulse"> 0</div>	
+				</div>
+				<p>Do you want to try again?</p>
+				<button id="try-again" class="button">Try Again</button>
+				<button id="exit" class="button">Exit</button>
+			</div>
 		</div>
 	</div>
 	

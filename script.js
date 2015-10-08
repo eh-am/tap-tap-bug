@@ -25,6 +25,9 @@ var BUGS_ARCHETYPES = [
 
 var gamePaused = false;
 
+var gameLoopId; // set interval id
+var handleTimerId; // set interval id
+
 /**
 * Prepare some stuff
 */
@@ -32,9 +35,9 @@ var init = function(){
 	/* set the highscore */
 	var highScore = localStorage.getItem("ttb-highScore") || 0;
 	document.getElementById("highScore").textContent = highScore;
-	
-	
 }();
+
+
 
 var startButton = document.getElementById("startGameButton");
 startButton.addEventListener("click", function (e){
@@ -65,6 +68,7 @@ function startGame(){
 	document.getElementById("game-wrapper").className = "";
 	var selectedLevel = getSelectedLevel();
 	document.getElementById("start-page").className = "hide";
+	document.getElementById("pop-up").className = "hide";
 
 	ctx.canvas.width = GAME_WIDTH;
 	ctx.canvas.height = GAME_HEIGHT;
@@ -79,14 +83,15 @@ function startGame(){
 
 	currentTime = GAME_TIME;
 	document.getElementById("timer-content").textContent = currentTime--; // sets game time
-	setInterval(handleTimer, 1000); // updates game time
+	handleTimerId = setInterval(handleTimer, 1000); // updates game time
 
 
 	document.getElementById("pause-play").addEventListener("click", handlePauseButton);
 	document.addEventListener("click", handleKillClick);
 
-	setInterval(gameLoop, 1000/GAME_FPS);
+	gameLoopId = setInterval(gameLoop, 1000/GAME_FPS);
 }
+
 
 function handleTimer(){
 	if (gamePaused === true) return; // if game is paused, do nothing
@@ -123,8 +128,6 @@ function handleKillClick(e){
 }
 
 function killBug(bug){
-	// TODO
-	// updates scores
 	updateScore(bug.score);
 	bug.available = false;
 
@@ -141,8 +144,25 @@ function setNewHighScore(highScore){
 	}
 }
 
+function destroyEverything(){
+	foods = [];
+	bugs = [];
+	gamePaused = false;
+	gameScore = 0;
+
+	clearInterval(handleTimerId);
+	clearInterval(gameLoopId);
+
+}
+
+
 function gameOver(){
 	setNewHighScore(gameScore);
+	document.getElementById("pop-up").className = "";
+	document.getElementById("try-again").addEventListener("click", function(){
+		destroyEverything();
+		startGame();
+	});
 	// Todo
 	gamePaused = true;
 }
@@ -175,18 +195,21 @@ function getBugArchetype(){
 	});
 	return bug;
 }
+
 function spawnBug(){
-	setTimeout(spawnBug, getRandomSpawnTime());
+	
 	if (gamePaused === true){
 		return;
 	}
+	
+	setTimeout(spawnBug, getRandomSpawnTime());
 
 	var bugArchetype = getBugArchetype();
 
 	var bug = {
 		id: bugs.length,
 		x: getRandomNum(BUG_WIDTH/2, GAME_WIDTH - BUG_WIDTH/2),
-		y: -BUG_HEIGHT,
+		y: -BUG_HEIGHT - BUG_HEIGHT/2,
 		velocity: bugArchetype.velocity[getSelectedLevel() - 1],
 		width: BUG_WIDTH,
 		height: BUG_HEIGHT,

@@ -24,7 +24,7 @@ body{
 	text-align: center;
 	color: #000;
 }
-.startPageForm button{
+.button{
 	padding: 20px;
 	font-size: 20px;
 	border: 0;
@@ -80,4 +80,26 @@ body{
 
 .hide{
 	display: none;
+}
+
+#pop-up{
+	font-family: Verdana, sans-serif;
+	background: #f1c40f;
+	text-align: center;
+
+    box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.75);
+	/* center*/
+	position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+    width: 50%;
+    height: 50%;
+}
+
+#pop-up h1{
+	font-family: 'Walter Turncoat', cursive;
+
 }

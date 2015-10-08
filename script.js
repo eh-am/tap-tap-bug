@@ -74,32 +74,36 @@ function startGame(){
 	
 
 	FoodGenerator.generate();
+
 	setTimeout(spawnBug, getRandomSpawnTime());
 
-	var currentTime = GAME_TIME;
-	document.getElementById("timer-content").textContent = currentTime;
-	setInterval(function (){
-		if (gamePaused === true) return;
+	currentTime = GAME_TIME;
+	document.getElementById("timer-content").textContent = currentTime--; // sets game time
+	setInterval(handleTimer, 1000); // updates game time
 
-		document.getElementById("timer-content").textContent = currentTime--; 
-		if (currentTime <= 0 || foods.length <= 0){
-			gameOver();
-		}
-	}, 1000);
 
-	document.getElementById("pause-play").addEventListener("click", function(){
-		if (gamePaused === false){
-			document.getElementById("pause-play").innerHTML = "&#9658;";
-			gamePaused = true;
-		} else {
-			document.getElementById("pause-play").innerHTML = "&#10074;&#10074;";
-			gamePaused = false;
-		}
-
-	});
+	document.getElementById("pause-play").addEventListener("click", handlePauseButton);
+	document.addEventListener("click", handleKillClick);
 
 	setInterval(gameLoop, 1000/GAME_FPS);
-	document.addEventListener("click", handleKillClick);
+}
+
+function handleTimer(){
+	if (gamePaused === true) return; // if game is paused, do nothing
+	document.getElementById("timer-content").textContent = currentTime; 
+
+	if (currentTime-- <= 0 || foods.length <= 0) gameOver();
+}
+
+
+
+function handlePauseButton(){
+	if (gamePaused === false)
+			document.getElementById("pause-play").innerHTML = "&#9658;"; // changes to a play icon
+	else
+		document.getElementById("pause-play").innerHTML = "&#10074;&#10074;"; // changes to a pause icon
+	
+	gamePaused = !gamePaused;
 }
 
 /*

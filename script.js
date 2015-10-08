@@ -3,7 +3,7 @@
 var GAME_WIDTH = 400;
 var GAME_HEIGHT = 600;
 var GAME_TIME = 60;
-var GAME_FPS = 70;
+var GAME_FPS = 60;
 var GAME_BACKGROUND = "236, 240, 241";
 var gameScore = 0;
 
@@ -73,11 +73,7 @@ function startGame(){
 	ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 	
 
-	console.log(FoodGenerator);
 	FoodGenerator.generate();
-	//spawnInitialFood();
-	
-	//spawnBug();
 	setTimeout(spawnBug, getRandomSpawnTime());
 
 	var currentTime = GAME_TIME;
@@ -110,7 +106,6 @@ function startGame(){
 *	Handle when the user clicks to kill a bug
 */
 function handleKillClick(e){
-	console.log("cliquei");
 	if (gamePaused === true) return;
 	var canvas = document.getElementById("game");
   	var d;
@@ -183,13 +178,12 @@ function spawnBug(){
 	}
 
 	var bugArchetype = getBugArchetype();
-	console.log(bugArchetype);
 
 	var bug = {
 		id: bugs.length,
 		x: getRandomNum(BUG_WIDTH/2, GAME_WIDTH - BUG_WIDTH/2),
 		y: -BUG_HEIGHT,
-		velocity: bugArchetype.velocity[getSelectedLevel()],
+		velocity: bugArchetype.velocity[getSelectedLevel() - 1],
 		width: BUG_WIDTH,
 		height: BUG_HEIGHT,
 		color: bugArchetype.color,
@@ -244,9 +238,8 @@ function rotateBugToFood(nearestFood, bug){
 	var pivotX = bug.x + bug.width/2;
 	var pivotY = bug.y + bug.height/2;
 
-	// 
-	bug.angleDesired = (angle + 0.5 * Math.PI);	
-	bug.angle += (Math.sign(bug.angleDesired - bug.angle) * Math.PI/180);	
+	bug.angleDesired = angle + (90 * Math.PI/180);
+	bug.angle += Math.sign(bug.angleDesired - bug.angle) * Math.PI/180;
 	
 	ctx.translate(pivotX, pivotY);
 	ctx.rotate(bug.angle);
@@ -276,9 +269,10 @@ function updateBug(bug){
 
 
 	// if it's aligned
-	if (parseInt(bug.angle) === parseInt(bug.angleDesired)){
-		moveForward();	
-	}
+	moveForward();
+	// if (parseInt(bug.angle) === parseInt(bug.angleDesired)){
+	// 	moveForward();	
+	// }
 	
 
 	function moveForward(){
@@ -297,8 +291,8 @@ function updateBug(bug){
 		var futureBug = {
 			id: bug.id,
 			velocity: bug.velocity,
-			x: bug.x + moveX * 2,
-			y: bug.y + moveY * 2,
+			x: bug.x + moveX,
+			y: bug.y + moveY,
 			width: BUG_WIDTH,
 			height: BUG_HEIGHT,
 			format: 'rectangle'
@@ -384,12 +378,8 @@ function renderBug(bug){
 					 2 * Math.PI);
 
 			path.ellipse(0, 0, BUG_WIDTH/2, BUG_HEIGHT - 13, 0, 0, 2 * Math.PI);
-			//path.ellipse(pivotX, pivotY)
-        	//path.arc(bug.x - pivotX, bug.y - pivotY, 4, 0, 2 * Math.PI, false);
-        	//path.ellipse(bug.x - pivotX, bug.y - pivotY, 13, 3, 90 * Math.PI/180, 0, 2 * Math.PI);
         	ctx.fill(path);
         	
-        	//ctx.restore();
 			
 			ctx.fillStyle = "rgba(" + bug.color + ", " + bug.opacity +")";
         	ctx.beginPath();

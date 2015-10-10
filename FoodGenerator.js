@@ -1,7 +1,10 @@
 
 var FoodGenerator = (function (){
 	function spawnInitialFood(){
-		for (var i = 0; i < 5; i++) drawFood();
+		for (var i = 0; i < 5; i++){
+			var newFood = generateFoodPosition();
+			foods.push(newFood);
+		}
 	}
 	function redraw(){
 		foods.forEach(function (food){
@@ -61,13 +64,6 @@ var FoodGenerator = (function (){
 		});
 		ctx.restore();
 	}
-	function drawFood(){
-		var newFood = generateFoodPosition();
-
-		foods.push(newFood);
-		ctx.fillStyle = "rgba(100, 100, 200, 0.5)";
-		ctx.fillRect(newFood.x, newFood.y, FOOD_WIDTH, FOOD_HEIGHT);
-	}
 
 	function generateFoodPosition(){
 		function generate(){
@@ -104,12 +100,10 @@ var FoodGenerator = (function (){
 	}
 
 	function removeFood(food){
-		//TODO
 		food.available = false;
 	}
 
 	function hasFoodCollision(obj1, obj2){
-		// TODO
 		// collision only handling rectangles for now
 		if (obj1.format === 'rectangle' && obj2.format === 'rectangle'){
 			if (obj1.x < obj2.x + obj2.width &&

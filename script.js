@@ -131,7 +131,6 @@ function handleKillClick(e){
 	var canvas = document.getElementById("game");
   	var d;
 	
-	console.log(e);
 	bugs.forEach(function (bug){
 		d = getDistanceBetween({ x: e.x - canvas.offsetLeft, y: e.y - canvas.offsetTop}, bug);
 		// if there's any bug in a radius of 30 px

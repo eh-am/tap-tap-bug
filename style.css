@@ -118,3 +118,30 @@ body{
 	font-family: 'Walter Turncoat', cursive;
 
 }
+
+
+
+
+@media only screen 
+  and (max-device-width: 667px) { 
+  	body {
+  		margin: 0;
+  	}
+	body #start-page{
+		font-size: 40px;
+	}
+	#game-wrapper .container{
+		background: transparent;
+	}
+
+	.container{
+		max-width: 100%;
+	}
+	#start-page{
+		width: 100%;
+	}
+	#start-page .button {
+		padding: 40px;
+		font-size: 40px;
+	}
+}

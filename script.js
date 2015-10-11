@@ -288,11 +288,13 @@ function updateBug(bug){
 *	Creates a new bug on screen
 */
 function spawnBug(){
+	// each new bug triggers the spawner for the next one
+	setTimeout(spawnBug, getRandomSpawnTime());
+
 	// do nothing if the game is paused
 	if (gamePaused === true) return;
 
-	// each bug triggers the spawner for the next one
-	setTimeout(spawnBug, getRandomSpawnTime());
+	
 
 	var bugArchetype = getBugArchetype();
 
